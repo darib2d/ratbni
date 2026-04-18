@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>لعبة رتّبني | تحدي الجمعات 🎲</title>
+
+ <meta name="description" content="تحدى أصحابك في لعبة رتبني! مئات الكلمات، ومنافسة حماسية. مين يجيبها صح؟">
+ <meta property="og:title" content="لعبة رتّبني | تحدي الجمعات 🎲">
+ <meta property="og:description" content="ادخل التحدي ورتب الكلمات المبعثرة. نسخة جديدة وتصميم رهيب!">
+ <meta property="og:image" content="https://your-app-name.vercel.app/logo.png">
+ <meta property="og:url" content="https://your-app-name.vercel.app">
+ <meta property="og:type" content="website">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="لعبة رتّبني | تحدي الجمعات 🎲">
+ <meta name="twitter:description" content="تحدى أصحابك ورتب الكلمات المبعثرة. العب الآن!">
+ <meta name="twitter:image" content="https://your-app-name.vercel.app/logo.png">
+
+ <script src="https://cdn.tailwindcss.com"></script>
+ <style>
+   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+   html, body { height: 100%; width: 100%; }
+   body { font-family: 'Tajawal', sans-serif; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); overflow: hidden; }
+   .app-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
+   .hidden { display: none !important; }
+
+   /* شاشة البداية */
+   .splash-screen {
+       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+       width: 100vw; height: 100vh;
+       display: flex; flex-direction: column; justify-content: center; align-items: center;
+       background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+       z-index: 99999;
+   }
+   .logo-img-splash { width: 280px; max-width: 80%; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+   .logo-subtitle { font-size: 18px; color: white; font-weight: 500; margin-bottom: 20px; text-align: center; }
+   
+   .splash-social { display: flex; gap: 15px; margin-top: 10px; }
+   .splash-social a {
+       width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.2);
+       display: flex; align-items: center; justify-content: center; color: white;
+       border: 1px solid rgba(255,255,255,0.5); transition: all 0.3s; text-decoration: none;
+   }
+   .splash-social a:hover { transform: scale(1.1); background: rgba(255,255,255,0.3); }
+
+   @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+   /* الشاشة الرئيسية */
+   .home-screen { width: 100%; height: 100%; display: none; flex-direction: column; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); overflow-y: auto; }
+   .header { padding: 15px; display: flex; justify-content: space-between; background: rgba(0,0,139,0.9); color: white; align-items: center; height: 70px; flex-shrink: 0; }
+   .header-logo { height: 45px; width: auto; object-fit: contain; }
+
+   .home-content-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; width: 100%; }
+   .welcome-card { background: white; border-radius: 24px; padding: 30px 20px; text-align: center; width: 100%; max-width: 500px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+   .main-btn { background: #00008B; color: white; width: 100%; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 10px; font-size: 18px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,139,0.3); transition: transform 0.2s; }
+   .main-btn:active { transform: scale(0.95); }
+
+   /* قسم التواصل */
+   .contact-section { margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; }
+   .social-row { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+   .social-btn { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: transform 0.2s; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+   .social-btn:hover { transform: scale(1.1); }
+   .tiktok-btn { background: #000000; }
+   .whatsapp-btn { background: #25D366; }
+   .email-btn { background: #00008B; }
+
+   /* نافذة التفعيل */
+   .activation-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; }
+   .activation-card { background: white; width: 100%; max-width: 400px; border-radius: 20px; padding: 30px; text-align: center; border: 4px solid #D4AF37; position: relative; }
+   .activation-input { width: 100%; padding: 15px; border: 2px solid #00008B; border-radius: 10px; font-size: 20px; text-align: center; margin: 15px 0; letter-spacing: 2px; text-transform: uppercase; }
+   .buy-link-btn { display: block; width: 100%; padding: 14px; margin-top: 10px; background: #25D366; color: white; border-radius: 10px; text-decoration: none; font-weight: bold; }
+
+   /* باقي الشاشات */
+   .categories-screen, .players-screen, .results-screen { display: none; width: 100%; height: 100%; flex-direction: column; background: #B8860B; }
+   .categories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; overflow-y: auto; padding-bottom: 80px; }
+   .category-card { background: white; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; }
+   .category-card.selected { background: #e6f0ff; border-color: #00008B; transform: scale(1.02); }
+
+   .ready-screen { display: none; width: 100%; height: 100%; background: #00008B; flex-direction: column; justify-content: center; align-items: center; z-index: 150; position: fixed; top: 0; left: 0; }
+   .pulse-btn { background: transparent; border: 4px solid white; color: white; font-size: 42px; font-weight: 800; padding: 25px 50px; border-radius: 50px; cursor: pointer; animation: pulse 1.5s infinite; font-family: 'Tajawal', sans-serif; }
+   @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+   /* اللعب */
+   .game-screen { display: none; width: 100%; height: 100%; background: #B8860B; flex-direction: column; padding: 15px; overflow: hidden; }
+   .game-layout { display: flex; flex-direction: column; height: 100%; gap: 15px; }
+   .game-card { perspective: 1000px; width: 100%; max-width: 450px; height: 280px; margin: 0 auto; cursor: pointer; position: relative; }
+   .game-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+   .game-card.flipped .game-card-inner { transform: rotateY(180deg); }
+   .game-card-front, .game-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+   .game-card-front { background: linear-gradient(135deg, #00008B, #000060); color: white; }
+   .game-card-back { background: linear-gradient(135deg, #059669, #047857); color: white; transform: rotateY(180deg); }
+   .live-rank { background: rgba(255,255,255,0.9); border-radius: 15px; padding: 10px; margin-top: 10px; max-height: 100px; overflow-y: auto; }
+   .rank-item { display: flex; justify-content: space-between; font-size: 14px; border-bottom: 1px solid #ddd; padding: 5px 0; }
+
+/* --- إعدادات وضع الطول (الجوال واقف) --- */
+@media screen and (orientation: portrait) {
+    #printed-family-name {
+        position: absolute;
+        top: 50% !important; /* مكان الاسم تحت "فعاليات عيد" */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        text-align: center;
+        font-size: clamp(50px, 12vw, 150px) !important;
+    }
+    .photo-screen button {
+        bottom: 8% !important; /* الزر مرتاح تحت */
+    }
+}
+
+/* --- إعدادات وضع العرض (التلفزيون أو الجوال مايل) --- */
+@media screen and (orientation: landscape) {
+    #printed-family-name {
+        position: absolute;
+        top: 64% !important; /* نرفع الاسم عشان يهرب من الزر */
+        left: 52%;
+        transform: translateX(-50%);
+        width: 100%;
+        text-align: center;
+        font-size: clamp(35px, 8vw, 100px) !important; /* نصغره شوي للعرض */
+    }
+    .photo-screen button {
+        bottom: 4% !important; /* ننزل الزر لأقصى حد تحت */
+        padding: 5px 25px !important; /* نصغر حجم الزر */
+        font-size: 18px !important;
+    }
+}
+
+ </style>
+</head>
+<body oncontextmenu="return false">
+
+ <div class="app-container">
+  <div class="splash-screen" id="splashScreen">
+   <img src="logo.png" alt="رتّبنـي" class="logo-img-splash">
+   <p class="logo-subtitle">لعبة جماعية قائمة على ترتيب الكلمات</p>
+   <div class="splash-social">
+       <a href="https://www.tiktok.com/@ratbni" target="_blank">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+       </a>
+       <a href="https://wa.me/966594703049" target="_blank">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+       </a>
+       <a href="mailto:Dari.b2d@gmail.com" class="splash-social-btn">
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+       </a>
+   </div>
+  </div>
+
+  <main class="home-screen" id="homeScreen">
+   <header class="header">
+    <div style="width:40px"></div>
+    <img src="logo.png" alt="رتّبنـي" class="header-logo">
+    <div id="statusBadge" style="font-size:12px; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:10px;">نسخة مجانية</div>
+   </header>
+
+   <div class="home-content-wrapper">
+       <div class="welcome-card">
+           <div style="font-size:60px; margin-bottom:15px">👋</div>
+           <h2 style="color:#00008B; font-size:28px; margin-bottom:10px;">هلا والله!</h2>
+           <p style="color:#555; margin-bottom:20px; line-height:1.6;">
+               العب، اضحك، وتحدى أصحابك.<br>
+               <span style="font-size:12px; color:#888;">(النسخة المجانية: كلمات محدودة)</span>
+           </p>
+
+           <button class="main-btn" id="startBtn">لعبة جديدة</button>
+
+<button class="main-btn" id="onlineBtn" style="background: #D4AF37; margin-top: 10px;">
+     اللعب أونلاين (تجريبي)
+</button>
+           <div id="freeGamesInfo" style="margin-top:15px; font-size:14px; color:#888;">
+               المتبقي: <span id="gamesCount" style="color:#00008B; font-weight:bold;">1</span> جولة مجانية
+           </div>
+
+           <button onclick="showActivationModal()" style="background:transparent; color:#00008B; border:none; margin-top:10px; text-decoration:underline; cursor:pointer; font-size:14px;">
+               لديك كود تفعيل؟ اضغط هنا
+           </button>
+
+           <div class="contact-section">
+               <p style="color:#888; font-size:14px; margin-bottom:5px; font-weight:bold;">تواصل معنا</p>
+               <div class="social-row">
+                   <a href="https://www.tiktok.com/@ratbni" target="_blank" class="social-btn tiktok-btn">
+                       <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                   </a>
+                   <a href="https://wa.me/966594703049" target="_blank" class="social-btn whatsapp-btn">
+                       <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                   </a>
+                   <a href="mailto:Dari.b2d@gmail.com" class="social-btn email-btn">
+                       <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                   </a>
+               </div>
+           </div>
+       </div>
+   </div>
+  </main>
+
+  <div class="activation-modal" id="activationModal">
+      <div class="activation-card">
+          <h2 style="color:#00008B; font-size:22px; font-weight:bold;">تفعيل النسخة الكاملة 🔓</h2>
+          <p style="color:#555; margin:10px 0; font-size:14px;">أدخل الكود الذي وصلك</p>
+          <input type="text" id="activationCodeInput" class="activation-input" placeholder="RT-xxxx-xx">
+          <div id="activationError" style="color:red; font-size:14px; display:none; margin-bottom:10px;">الكود غير صحيح!</div>
+          <button class="main-btn" onclick="validateCode()">تفعيل الآن</button>
+          <button onclick="closeActivationModal()" style="margin-top:10px; background:none; border:none; color:#666; cursor:pointer; font-size:14px;">إلغاء</button>
+          <hr style="margin:15px 0; border-color:#eee;">
+          <a href="https://salla.sa/dare/XzWQoRw" target="_blank" class="buy-link-btn">اشترِ الكود بـ 29 ريال</a>
+      </div>
+  </div>
+
+  <div class="categories-screen" id="categoriesScreen">
+      <div style="padding:20px; text-align:center; color:white;"><h2>اختر الفئات</h2><p id="catInstruction">0/6</p></div>
+      <div class="categories-grid" id="categoriesGrid"></div>
+      <div style="padding:20px;"><button class="main-btn" id="toPlayersBtn" disabled style="background:#ccc;">التالي</button></div>
+  </div>
+
+  <div class="players-screen" id="playersScreen">
+      <div style="padding:20px; flex:1; display:flex; flex-direction:column; align-items:center;">
+          <div style="background:white; width:100%; border-radius:20px; padding:20px; max-width:400px;">
+              <h3>أسماء اللاعبين</h3>
+              <div style="display:flex; gap:10px; margin:15px 0;"><input id="playerName" type="text" placeholder="الاسم" style="flex:1; border:1px solid #ccc; padding:10px; border-radius:5px; text-align:right;"><button id="addPBtn" style="width:40px; background:#00008B; color:white; border-radius:5px;">+</button></div>
+              <div id="pList" style="margin-bottom:15px;"></div>
+              <button class="main-btn" id="goPlayBtn">التالي</button>
+          </div>
+      </div>
+  </div>
+<div class="theme-screen" id="themeScreen" style="display: none; width: 100%; height: 100%; flex-direction: column; background: #B8860B; justify-content: center; align-items: center; padding: 20px;">
+      <div style="background:white; width:100%; border-radius:20px; padding:30px; max-width:400px; text-align:center;">
+          <h3 style="color:#00008B; margin-bottom:15px;">إعدادات العرض 📸</h3>
+          <input type="text" id="familyNameInput" placeholder="اكتب اسم العائلة/الجمعة..." style="width:100%; padding:12px; border:2px solid #ccc; border-radius:10px; margin-bottom:15px; font-size:16px; text-align:center; font-family: 'Tajawal', sans-serif;">
+          <select id="themeSelect" style="width:100%; padding:12px; border:2px solid #00008B; border-radius:10px; margin-bottom:20px; font-size:16px; text-align:center; outline:none; font-family: 'Tajawal', sans-serif;">
+              <option value="official">الثيم الرسمي لـ رتّبني 🎯</option>
+              <option value="eid">ثيم فعاليات العيد 🌙</option>
+              <option value="gathering">ثيم فعاليات جمعتنا ☕️</option>
+          </select>
+          <button class="main-btn" onclick="goToPhotoScreen()">التالي</button>
+      </div>
+  </div>
+
+<div class="photo-screen" id="photoScreen" style="display: none; width: 100%; height: 100%; background-size: cover; background-position: center; position: absolute; top:0; left:0; z-index: 300; flex-direction:column; justify-content: center; align-items: center;">
+      
+      <h1 id="printed-family-name" style="font-family: 'Tajawal', sans-serif; font-size: clamp(60px, 12vw, 150px); font-weight: 900; margin: 0; text-shadow: 3px 3px 5px rgba(0,0,0,0.2); position: absolute; top: 60%;"></h1>
+      
+      <button onclick="continueToGame()" style="position: absolute; bottom: 8%; padding: clamp(10px, 2vw, 15px) clamp(20px, 5vw, 40px); font-size: clamp(16px, 4vw, 24px); background-color: #00008B; color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: bold; font-family: 'Tajawal', sans-serif; white-space: nowrap;">
+          يلا نبدأ ⏱️
+      </button>
+  </div>
+  <div class="ready-screen" id="readyScreen">
+      <button class="pulse-btn" id="realStartBtn">( نبدأ ؟ )</button>
+  </div>
+
+  <div class="game-screen" id="gameScreen">
+      <div class="game-layout">
+<div id="bigWinnerAnnouncement" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5, 150, 105, 0.95); z-index:9999; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center;">
+    <div style="font-size:80px; margin-bottom:20px;">🎉</div>
+    <h1 style="font-size:30px; opacity:0.9;">الحل الصحيح هو</h1>
+    <h2 id="correctWordBig" style="font-size:50px; margin-bottom:20px; color:#FFD700; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);">---</h2>
+    <h3 style="font-size:24px; font-weight:900;">تم حلها بواسطة</h3>
+    <h2 id="winnerNameBig" style="font-size:50px; color:white;">---</h2>
+    <p id="waitHostMsg" style="font-size:18px; opacity:0.8; margin-top:20px;">انتظر المضيف لبدء الكلمة التالية...</p>
+<button id="hostNextBtnBig" onclick="nextOnlineWord()" style="display:none; margin-top:20px; padding:15px 40px; background:#FFD700; color:black; border-radius:15px; border:none; font-weight:bold; font-size:20px; cursor:pointer;">الكلمة التالية >></button>
+</div>
+          <div class="game-header-section" style="display:flex; justify-content:space-between; color:white; align-items:center;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                  <img src="logo.png" alt="رتّبنـي" style="height:40px; width:auto;">
+                  <div id="gameCatBadge" style="background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:15px; font-size:14px;">...</div>
+              </div>
+              <div id="gameProgress" style="font-weight:bold;">1/30</div>
+          </div>
+
+          <div class="game-card-section" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div id="timerDisplay" style="background:#00008B; color:white; font-size:32px; font-weight:bold; padding:5px 20px; border-radius:20px; margin-bottom:10px;">30</div>
+              <div class="game-card" id="theCard">
+                  <div class="game-card-inner">
+                      <div class="game-card-front">
+                          <small style="opacity:0.8;">الكلمة المبعثرة</small>
+                          <h2 id="scrambledText" style="font-size:32px; line-height:1.4;">---</h2>
+                          <p style="font-size:12px; margin-top:15px; opacity:0.7;">اضغط للكشف</p>
+                      </div>
+                      <div class="game-card-back">
+                          <small style="opacity:0.8;">الحل هو</small>
+                          <h2 id="correctText" style="font-size:36px;">---</h2>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="game-controls-section" style="background:white; border-radius:15px; padding:15px;">
+              <div style="display:flex; gap:10px; margin-bottom:15px;">
+                  <button id="nextCardBtn" style="flex:2; background:#059669; color:white; padding:12px; border-radius:10px; border:none; font-weight:bold;">التالي >></button>
+                  <button id="pauseBtn" style="flex:1; background:#dc2626; color:white; border-radius:10px; border:none;">إيقاف</button>
+              </div>
+              <p style="text-align:right; font-weight:bold; margin-bottom:8px; color:#333; font-size:14px;">مين اللي جابها؟</p>
+<div id="onlineInputArea" style="display:none; flex-direction:column; align-items:center; margin-bottom:15px; width:100%;">
+    <div style="display:flex; width:100%; gap:8px;">
+        <input type="text" id="playerAnswer" placeholder="اكتب الحل هنا..." 
+               style="flex:1; padding:15px; border:3px solid #00008B; border-radius:15px; text-align:center; font-size:20px; font-family:'Tajawal';">
+        <button onclick="checkAnswerManual()" style="width:70px; background:#00008B; color:white; border-radius:15px; font-size:24px; cursor:pointer;">✔️</button>
+    </div>
+    <p id="answerStatus" style="font-size:16px; margin-top:8px; font-weight:bold; height:24px; transition: 0.3s;"></p>
+</div>
+              <div id="scoreButtons" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;"></div>
+              <div class="live-rank" id="liveRankList"></div>
+          </div>
+      </div>
+  </div>
+
+  <div class="results-screen" id="resultsScreen" style="justify-content:center; align-items:center;">
+      <div style="background:white; width:90%; max-width:400px; border-radius:24px; padding:30px; text-align:center;">
+          <h2 style="color:#00008B; margin-bottom:20px;">النتــائــج 🏆</h2>
+          <div id="finalScores" style="margin-bottom:25px; text-align:right;"></div>
+          <button class="main-btn" id="homeBackBtn">العودة للرئيسية</button>
+      </div>
+  </div>
+ </div>
+<div id="onlineLoginScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;">
+    <div style="background: white; width: 90%; max-width: 400px; border-radius: 25px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h3 style="color: #00008B; margin-bottom: 20px; font-weight: bold; font-size: 22px;"> دخول الأونلاين</h3>
+        <input id="onlinePlayerName" type="text" placeholder="اكتب اسمك هنا" style="width: 100%; border: 2px solid #ddd; padding: 12px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-family: 'Tajawal';">
+        <div style="background: #fdfdfd; padding: 15px; border-radius: 15px; border: 1px dashed #ccc; margin-bottom: 15px;">
+            <input id="onlineRoomID" type="number" placeholder="رقم الغرفة (إذا عندك)" style="width: 100%; border: 1px solid #ccc; padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
+            <button class="main-btn" onclick="joinOnlineRoom()" style="background: #00008B; margin: 0;">انضمام للغرفة</button>
+        </div>
+        <p style="margin: 10px 0; color: #888;">— أو —</p>
+        <button class="main-btn" onclick="createOnlineRoom()" style="background: #059669; margin: 0;">إنشاء غرفة جديدة</button>
+        <button onclick="location.reload()" style="margin-top: 20px; color: #E11D48; background: none; border: none; cursor: pointer; font-weight: bold; text-decoration: underline;">تراجع</button>
+</div>
+</div>
+<div id="lobbyScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+    <h2 style="color: #00008B; margin-bottom: 10px;">بانتظار اللاعبين...</h2>
+    <h1 id="lobbyRoomDisplay" style="background: #f0f0f0; padding: 10px 20px; border-radius: 15px; margin-bottom: 30px;">رقم الغرفة: ----</h1>
+    <div style="width: 100%; max-width: 300px; background: #fafafa; border-radius: 15px; padding: 20px; border: 1px solid #eee;">
+        <p style="font-weight: bold; margin-bottom: 10px; color: #888;">اللاعبون المتصلون:</p>
+        <div id="lobbyPlayersList" style="font-size: 20px; color: #00008B; line-height: 2;"></div>
+    </div>
+    <button id="hostStartBtn" style="display:none; margin-top:30px; padding:15px 40px;background:#00008B; border-radius:15px; border:none; font-weight:bold; cursor:pointer;">اختر الفئات وابدأ اللعب 🚀</button>
+    <p id="playerWaitMsg" style="margin-top:20px; color:#666; display:none;">بانتظار المضيف لبدء اللعبة...</p>
+</div>
+‬      <script>
+const _0x3d9cbe=_0x12fa;(function(_0x2cb226,_0x29204f){const _0x53a1b4=_0x12fa,_0x37a6d0=_0x2cb226();while(!![]){try{const _0x3e7898=-parseInt(_0x53a1b4(0x38b))/0x1+parseInt(_0x53a1b4(0x4f0))/0x2+-parseInt(_0x53a1b4(0x57b))/0x3+parseInt(_0x53a1b4(0x28a))/0x4*(-parseInt(_0x53a1b4(0x403))/0x5)+parseInt(_0x53a1b4(0x30f))/0x6+-parseInt(_0x53a1b4(0x52e))/0x7*(-parseInt(_0x53a1b4(0x1d5))/0x8)+parseInt(_0x53a1b4(0x343))/0x9;if(_0x3e7898===_0x29204f)break;else _0x37a6d0['push'](_0x37a6d0['shift']());}catch(_0x486689){_0x37a6d0['push'](_0x37a6d0['shift']());}}}(_0x55d1,0xe4c12));const FULL_DATA={'c1':{'name':'دول','icon':'🌍','words':[{'c':'السعودية','s':_0x3d9cbe(0x48a)},{'c':_0x3d9cbe(0x21e),'s':'ص\x20م\x20ر'},{'c':'الأردن','s':_0x3d9cbe(0x452)},{'c':_0x3d9cbe(0x30b),'s':_0x3d9cbe(0x53c)},{'c':_0x3d9cbe(0x2a0),'s':_0x3d9cbe(0x544)},{'c':_0x3d9cbe(0x42c),'s':'ن\x20ا\x20ل\x20ب\x20ن'},{'c':_0x3d9cbe(0x56e),'s':'ب\x20ا\x20ي\x20ل\x20ي'},{'c':_0x3d9cbe(0x2dd),'s':_0x3d9cbe(0x1f3)},{'c':'العراق','s':'ر\x20ق\x20ا\x20ع\x20ل\x20ا'},{'c':_0x3d9cbe(0x424),'s':_0x3d9cbe(0x2de)},{'c':_0x3d9cbe(0x4c4),'s':_0x3d9cbe(0x4ae)},{'c':_0x3d9cbe(0x4bf),'s':_0x3d9cbe(0x383)},{'c':_0x3d9cbe(0x3a2),'s':_0x3d9cbe(0x361)},{'c':_0x3d9cbe(0x3cc),'s':_0x3d9cbe(0x410)},{'c':_0x3d9cbe(0x27e),'s':_0x3d9cbe(0x1fe)},{'c':_0x3d9cbe(0x273),'s':'ر\x20ا\x20س\x20ن\x20ف'},{'c':_0x3d9cbe(0x428),'s':_0x3d9cbe(0x3db)},{'c':_0x3d9cbe(0x5dc),'s':_0x3d9cbe(0x211)},{'c':_0x3d9cbe(0x26e),'s':_0x3d9cbe(0x340)},{'c':_0x3d9cbe(0x4dd),'s':_0x3d9cbe(0x328)},{'c':_0x3d9cbe(0x2d9),'s':_0x3d9cbe(0x4ea)},{'c':_0x3d9cbe(0x206),'s':_0x3d9cbe(0x491)},{'c':_0x3d9cbe(0x46b),'s':'و\x20س\x20ا\x20د\x20ي\x20ل'},{'c':_0x3d9cbe(0x3c8),'s':_0x3d9cbe(0x3cf)},{'c':_0x3d9cbe(0x2f5),'s':_0x3d9cbe(0x270)},{'c':'فنلندا','s':_0x3d9cbe(0x3a9)},{'c':_0x3d9cbe(0x415),'s':_0x3d9cbe(0x2e6)},{'c':_0x3d9cbe(0x4a9),'s':'و\x20س\x20ي\x20ا\x20ر'},{'c':'البرازيل','s':'ز\x20ي\x20ل\x20ر\x20ا\x20ب\x20ا'},{'c':_0x3d9cbe(0x29e),'s':'ج\x20ي\x20ن\x20ت\x20ر\x20ن\x20ل\x20أ'},{'c':_0x3d9cbe(0x3f4),'s':_0x3d9cbe(0x4a8)},{'c':_0x3d9cbe(0x239),'s':'ن\x20د\x20ا\x20ل\x20ه'},{'c':_0x3d9cbe(0x2c8),'s':'ا\x20ن\x20ب\x20ي\x20ا\x20ل'},{'c':_0x3d9cbe(0x221),'s':'و\x20ر\x20ي\x20ا\x20ك'},{'c':_0x3d9cbe(0x21a),'s':_0x3d9cbe(0x4ad)},{'c':'المكسيك','s':'س\x20ك\x20ا\x20ل\x20م\x20ي'},{'c':_0x3d9cbe(0x568),'s':_0x3d9cbe(0x459)},{'c':'اليونان','s':_0x3d9cbe(0x524)},{'c':_0x3d9cbe(0x53a),'s':_0x3d9cbe(0x517)},{'c':_0x3d9cbe(0x251),'s':_0x3d9cbe(0x487)}]},'c2':{'name':'مدن','icon':_0x3d9cbe(0x302),'words':[{'c':'الرياض','s':_0x3d9cbe(0x47e)},{'c':'مكة','s':'ك\x20ة\x20م'},{'c':'المدينة','s':_0x3d9cbe(0x44f)},{'c':_0x3d9cbe(0x3c5),'s':'د\x20ج\x20ة'},{'c':_0x3d9cbe(0x3b2),'s':_0x3d9cbe(0x564)},{'c':_0x3d9cbe(0x4c0),'s':_0x3d9cbe(0x3a0)},{'c':_0x3d9cbe(0x387),'s':_0x3d9cbe(0x4de)},{'c':_0x3d9cbe(0x3c1),'s':_0x3d9cbe(0x535)},{'c':_0x3d9cbe(0x408),'s':_0x3d9cbe(0x297)},{'c':_0x3d9cbe(0x4dc),'s':_0x3d9cbe(0x4da)},{'c':'بريدة','s':'د\x20ب\x20ي\x20ر\x20ة'},{'c':_0x3d9cbe(0x49d),'s':'ن\x20ز\x20ة\x20ع\x20ي'},{'c':_0x3d9cbe(0x277),'s':_0x3d9cbe(0x542)},{'c':'جازان','s':_0x3d9cbe(0x4cc)},{'c':_0x3d9cbe(0x241),'s':_0x3d9cbe(0x392)},{'c':'القاهرة','s':_0x3d9cbe(0x4a2)},{'c':_0x3d9cbe(0x442),'s':'ب\x20ي\x20د'},{'c':_0x3d9cbe(0x4b7),'s':_0x3d9cbe(0x421)},{'c':_0x3d9cbe(0x23f),'s':_0x3d9cbe(0x310)},{'c':_0x3d9cbe(0x5ad),'s':_0x3d9cbe(0x4f2)},{'c':'الدوحة','s':_0x3d9cbe(0x3b6)},{'c':'مسقط','s':_0x3d9cbe(0x1d0)},{'c':_0x3d9cbe(0x20b),'s':_0x3d9cbe(0x23b)},{'c':_0x3d9cbe(0x51b),'s':_0x3d9cbe(0x4ce)},{'c':_0x3d9cbe(0x3b7),'s':_0x3d9cbe(0x2e9)},{'c':_0x3d9cbe(0x2bc),'s':_0x3d9cbe(0x39b)},{'c':_0x3d9cbe(0x40c),'s':_0x3d9cbe(0x543)},{'c':_0x3d9cbe(0x5db),'s':_0x3d9cbe(0x3bf)},{'c':_0x3d9cbe(0x215),'s':_0x3d9cbe(0x46e)},{'c':_0x3d9cbe(0x371),'s':_0x3d9cbe(0x48b)},{'c':'الرباط','s':'ا\x20ب\x20ر\x20ل\x20ا\x20ط'},{'c':'طرابلس','s':_0x3d9cbe(0x474)},{'c':_0x3d9cbe(0x413),'s':_0x3d9cbe(0x468)},{'c':'لندن','s':_0x3d9cbe(0x267)},{'c':_0x3d9cbe(0x54d),'s':_0x3d9cbe(0x508)},{'c':_0x3d9cbe(0x551),'s':_0x3d9cbe(0x5be)},{'c':_0x3d9cbe(0x32b),'s':'ن\x20ي\x20ب\x20ر\x20ل'},{'c':'طوكيو','s':_0x3d9cbe(0x5bf)},{'c':_0x3d9cbe(0x411),'s':_0x3d9cbe(0x339)},{'c':_0x3d9cbe(0x5c9),'s':_0x3d9cbe(0x552)}]},'c3':{'name':'أكلات','icon':'🍽️','words':[{'c':'كبسة','s':_0x3d9cbe(0x3f2)},{'c':_0x3d9cbe(0x382),'s':_0x3d9cbe(0x264)},{'c':_0x3d9cbe(0x2bf),'s':_0x3d9cbe(0x51d)},{'c':'برغر','s':_0x3d9cbe(0x4fa)},{'c':_0x3d9cbe(0x59f),'s':_0x3d9cbe(0x26b)},{'c':'شاورما','s':_0x3d9cbe(0x4f6)},{'c':_0x3d9cbe(0x1f2),'s':'ا\x20ي\x20ر\x20ب\x20ن\x20ي'},{'c':_0x3d9cbe(0x51f),'s':_0x3d9cbe(0x426)},{'c':'طماطم','s':_0x3d9cbe(0x3f6)},{'c':_0x3d9cbe(0x271),'s':'ي\x20خ\x20ر\x20ا'},{'c':_0x3d9cbe(0x2c1),'s':_0x3d9cbe(0x438)},{'c':_0x3d9cbe(0x3ab),'s':_0x3d9cbe(0x1f7)},{'c':_0x3d9cbe(0x577),'s':'ل\x20ف\x20ف\x20ل'},{'c':'أرز','s':_0x3d9cbe(0x406)},{'c':_0x3d9cbe(0x1f8),'s':_0x3d9cbe(0x59d)},{'c':_0x3d9cbe(0x391),'s':_0x3d9cbe(0x359)},{'c':_0x3d9cbe(0x50a),'s':'ا\x20ر\x20ل\x20ت\x20ب\x20ق'},{'c':'عنب','s':_0x3d9cbe(0x529)},{'c':_0x3d9cbe(0x385),'s':_0x3d9cbe(0x57f)},{'c':_0x3d9cbe(0x51c),'s':_0x3d9cbe(0x27c)},{'c':'جح','s':'ح\x20ج'},{'c':_0x3d9cbe(0x4f9),'s':_0x3d9cbe(0x2a5)},{'c':_0x3d9cbe(0x386),'s':_0x3d9cbe(0x4d6)},{'c':_0x3d9cbe(0x34f),'s':_0x3d9cbe(0x44e)},{'c':'خبز','s':'ز\x20خ\x20ب'},{'c':'عصير','s':_0x3d9cbe(0x42b)},{'c':_0x3d9cbe(0x3ee),'s':_0x3d9cbe(0x3eb)},{'c':_0x3d9cbe(0x1d7),'s':_0x3d9cbe(0x4be)},{'c':_0x3d9cbe(0x212),'s':'م\x20ر\x20ت'},{'c':_0x3d9cbe(0x50d),'s':_0x3d9cbe(0x469)},{'c':_0x3d9cbe(0x1e8),'s':_0x3d9cbe(0x55f)},{'c':_0x3d9cbe(0x3e3),'s':_0x3d9cbe(0x4b2)},{'c':'دجاج','s':_0x3d9cbe(0x268)},{'c':_0x3d9cbe(0x348),'s':_0x3d9cbe(0x3d3)},{'c':'سمك','s':_0x3d9cbe(0x434)},{'c':_0x3d9cbe(0x318),'s':_0x3d9cbe(0x4e3)},{'c':_0x3d9cbe(0x3f7),'s':_0x3d9cbe(0x4db)},{'c':'ليمون','s':_0x3d9cbe(0x58e)},{'c':_0x3d9cbe(0x412),'s':_0x3d9cbe(0x503)},{'c':'خس','s':_0x3d9cbe(0x488)}]},'c4':{'name':_0x3d9cbe(0x3f3),'icon':'🦁','words':[{'c':'أسد','s':_0x3d9cbe(0x31b)},{'c':'نمر','s':_0x3d9cbe(0x4a7)},{'c':_0x3d9cbe(0x368),'s':_0x3d9cbe(0x45c)},{'c':'دب','s':_0x3d9cbe(0x3ed)},{'c':_0x3d9cbe(0x5d6),'s':_0x3d9cbe(0x35e)},{'c':'زرافة','s':'ف\x20ا\x20ر\x20ة\x20ز\x20ا'},{'c':_0x3d9cbe(0x292),'s':_0x3d9cbe(0x420)},{'c':_0x3d9cbe(0x527),'s':'ب\x20أ\x20ن\x20ر'},{'c':'سنجاب','s':_0x3d9cbe(0x5a8)},{'c':_0x3d9cbe(0x5b7),'s':'ف\x20ص\x20ر\x20و\x20ع'},{'c':_0x3d9cbe(0x53e),'s':_0x3d9cbe(0x54c)},{'c':_0x3d9cbe(0x1f1),'s':_0x3d9cbe(0x4af)},{'c':_0x3d9cbe(0x22e),'s':_0x3d9cbe(0x4e5)},{'c':_0x3d9cbe(0x447),'s':_0x3d9cbe(0x307)},{'c':_0x3d9cbe(0x36b),'s':_0x3d9cbe(0x3da)},{'c':'حصان','s':'ن\x20ا\x20ص\x20ح'},{'c':_0x3d9cbe(0x5c5),'s':_0x3d9cbe(0x57e)},{'c':_0x3d9cbe(0x398),'s':_0x3d9cbe(0x228)},{'c':'نسر','s':_0x3d9cbe(0x330)},{'c':_0x3d9cbe(0x4a6),'s':_0x3d9cbe(0x4c3)},{'c':_0x3d9cbe(0x30d),'s':_0x3d9cbe(0x49a)},{'c':'سمكة','s':_0x3d9cbe(0x575)},{'c':_0x3d9cbe(0x3f1),'s':'ر\x20ش\x20ق'},{'c':_0x3d9cbe(0x5de),'s':_0x3d9cbe(0x336)},{'c':'دولفين','s':'ف\x20ي\x20د\x20ن\x20ل\x20و'},{'c':_0x3d9cbe(0x435),'s':_0x3d9cbe(0x513)},{'c':_0x3d9cbe(0x2f1),'s':_0x3d9cbe(0x335)},{'c':'فهد','s':'ه\x20د\x20ف'},{'c':_0x3d9cbe(0x569),'s':'د\x20ر\x20ق'},{'c':'تمساح','s':_0x3d9cbe(0x5c8)},{'c':_0x3d9cbe(0x1f0),'s':_0x3d9cbe(0x2f6)},{'c':_0x3d9cbe(0x4b6),'s':_0x3d9cbe(0x1f9)},{'c':_0x3d9cbe(0x574),'s':_0x3d9cbe(0x3ef)},{'c':_0x3d9cbe(0x1d1),'s':'ة\x20ب\x20ط'},{'c':_0x3d9cbe(0x46a),'s':'ل\x20ة\x20ن\x20م'},{'c':_0x3d9cbe(0x1ea),'s':_0x3d9cbe(0x533)},{'c':_0x3d9cbe(0x38a),'s':_0x3d9cbe(0x414)},{'c':_0x3d9cbe(0x514),'s':'ر\x20و\x20خ\x20ف'},{'c':'بقرة','s':_0x3d9cbe(0x537)}]},'c5':{'name':_0x3d9cbe(0x256),'icon':'📝','words':[{'c':_0x3d9cbe(0x502),'s':_0x3d9cbe(0x379)},{'c':_0x3d9cbe(0x429),'s':_0x3d9cbe(0x205)},{'c':_0x3d9cbe(0x580),'s':_0x3d9cbe(0x579)},{'c':_0x3d9cbe(0x405),'s':'ح\x20م\x20ا\x20ت\x20ف'},{'c':_0x3d9cbe(0x536),'s':_0x3d9cbe(0x36a)},{'c':_0x3d9cbe(0x5d4),'s':_0x3d9cbe(0x35b)},{'c':_0x3d9cbe(0x53f),'s':'و\x20ل\x20ج\x20ا'},{'c':_0x3d9cbe(0x4c8),'s':_0x3d9cbe(0x37f)},{'c':_0x3d9cbe(0x238),'s':_0x3d9cbe(0x20f)},{'c':_0x3d9cbe(0x301),'s':_0x3d9cbe(0x3f8)},{'c':_0x3d9cbe(0x466),'s':_0x3d9cbe(0x397)},{'c':_0x3d9cbe(0x395),'s':'ر\x20ن\x20ف'},{'c':_0x3d9cbe(0x225),'s':'و\x20ل\x20ط\x20ة\x20ا'},{'c':_0x3d9cbe(0x337),'s':_0x3d9cbe(0x396)},{'c':_0x3d9cbe(0x35a),'s':_0x3d9cbe(0x2f2)},{'c':_0x3d9cbe(0x525),'s':_0x3d9cbe(0x20d)},{'c':_0x3d9cbe(0x3d1),'s':_0x3d9cbe(0x56f)},{'c':_0x3d9cbe(0x490),'s':_0x3d9cbe(0x592)},{'c':_0x3d9cbe(0x4f4),'s':_0x3d9cbe(0x454)},{'c':_0x3d9cbe(0x344),'s':_0x3d9cbe(0x583)},{'c':_0x3d9cbe(0x2ea),'s':_0x3d9cbe(0x39d)},{'c':'قميص','s':_0x3d9cbe(0x50b)},{'c':'فستان','s':_0x3d9cbe(0x57c)},{'c':'حذاء','s':_0x3d9cbe(0x210)},{'c':_0x3d9cbe(0x33b),'s':_0x3d9cbe(0x35f)},{'c':_0x3d9cbe(0x3d0),'s':_0x3d9cbe(0x423)},{'c':'شوكة','s':_0x3d9cbe(0x39a)},{'c':_0x3d9cbe(0x56a),'s':_0x3d9cbe(0x26d)},{'c':'صحن','s':_0x3d9cbe(0x507)},{'c':'سيارة','s':_0x3d9cbe(0x38e)},{'c':'ممحاة','s':_0x3d9cbe(0x226)},{'c':_0x3d9cbe(0x283),'s':'س\x20م\x20ة\x20ط\x20ر'},{'c':'طابعة','s':_0x3d9cbe(0x312)},{'c':_0x3d9cbe(0x516),'s':_0x3d9cbe(0x5d7)},{'c':_0x3d9cbe(0x3e8),'s':_0x3d9cbe(0x1e9)},{'c':'سماعة\x20رأس','s':_0x3d9cbe(0x266)},{'c':_0x3d9cbe(0x362),'s':_0x3d9cbe(0x1f4)},{'c':_0x3d9cbe(0x31c),'s':_0x3d9cbe(0x23e)},{'c':_0x3d9cbe(0x298),'s':_0x3d9cbe(0x4df)},{'c':_0x3d9cbe(0x2c3),'s':_0x3d9cbe(0x38f)}]},'c6':{'name':_0x3d9cbe(0x2bd),'icon':'💼','words':[{'c':_0x3d9cbe(0x46d),'s':'ع\x20م\x20ل\x20م'},{'c':_0x3d9cbe(0x590),'s':_0x3d9cbe(0x1e3)},{'c':_0x3d9cbe(0x55d),'s':_0x3d9cbe(0x367)},{'c':'ممرض','s':_0x3d9cbe(0x5ba)},{'c':_0x3d9cbe(0x46c),'s':_0x3d9cbe(0x498)},{'c':_0x3d9cbe(0x50c),'s':_0x3d9cbe(0x506)},{'c':_0x3d9cbe(0x21d),'s':'ن\x20د\x20ي\x20ج'},{'c':'خباز','s':'ز\x20ا\x20ب\x20خ'},{'c':'نجار','s':'ر\x20ا\x20ن\x20ج'},{'c':'حداد','s':_0x3d9cbe(0x224)},{'c':_0x3d9cbe(0x1c5),'s':_0x3d9cbe(0x548)},{'c':_0x3d9cbe(0x3d6),'s':_0x3d9cbe(0x31d)},{'c':_0x3d9cbe(0x523),'s':'ر\x20ز\x20ع\x20ا\x20م'},{'c':_0x3d9cbe(0x4ca),'s':_0x3d9cbe(0x5ab)},{'c':_0x3d9cbe(0x2c2),'s':_0x3d9cbe(0x495)},{'c':_0x3d9cbe(0x27f),'s':_0x3d9cbe(0x272)},{'c':_0x3d9cbe(0x43c),'s':'خ\x20ب\x20ا\x20ط'},{'c':_0x3d9cbe(0x567),'s':'ئ\x20ق\x20ا\x20س'},{'c':_0x3d9cbe(0x45f),'s':'ض\x20ي\x20ق\x20ا'},{'c':_0x3d9cbe(0x4d9),'s':_0x3d9cbe(0x4f8)},{'c':_0x3d9cbe(0x34e),'s':_0x3d9cbe(0x58a)},{'c':'مصور','s':_0x3d9cbe(0x4c1)},{'c':_0x3d9cbe(0x2b0),'s':_0x3d9cbe(0x32a)},{'c':_0x3d9cbe(0x4b3),'s':_0x3d9cbe(0x3c7)},{'c':_0x3d9cbe(0x2fd),'s':'ع\x20ل\x20م\x20ا'},{'c':_0x3d9cbe(0x1c6),'s':'ب\x20ت\x20ك\x20ا'},{'c':'جراح','s':_0x3d9cbe(0x1e0)},{'c':_0x3d9cbe(0x599),'s':_0x3d9cbe(0x376)},{'c':_0x3d9cbe(0x4a0),'s':'م\x20ي\x20ن\x20أ\x20ة\x20ب\x20ك\x20ت\x20م'},{'c':_0x3d9cbe(0x1e1),'s':_0x3d9cbe(0x1d4)},{'c':_0x3d9cbe(0x4c6),'s':_0x3d9cbe(0x29f)},{'c':_0x3d9cbe(0x553),'s':_0x3d9cbe(0x52f)},{'c':_0x3d9cbe(0x467),'s':_0x3d9cbe(0x3aa)},{'c':_0x3d9cbe(0x313),'s':_0x3d9cbe(0x2a4)},{'c':_0x3d9cbe(0x203),'s':_0x3d9cbe(0x200)},{'c':_0x3d9cbe(0x399),'s':_0x3d9cbe(0x245)},{'c':_0x3d9cbe(0x2fe),'s':'ش\x20ر\x20س\x20ت\x20م'},{'c':_0x3d9cbe(0x448),'s':_0x3d9cbe(0x3a7)},{'c':_0x3d9cbe(0x2dc),'s':_0x3d9cbe(0x2ef)},{'c':'مهندس\x20معماري','s':_0x3d9cbe(0x3fb)}]},'c7':{'name':_0x3d9cbe(0x1de),'icon':'🌳','words':[{'c':_0x3d9cbe(0x5b8),'s':_0x3d9cbe(0x416)},{'c':_0x3d9cbe(0x4bd),'s':'ب\x20ل\x20ج'},{'c':_0x3d9cbe(0x461),'s':_0x3d9cbe(0x52c)},{'c':_0x3d9cbe(0x556),'s':_0x3d9cbe(0x485)},{'c':_0x3d9cbe(0x372),'s':'ء\x20ص\x20ر\x20ح\x20ا'},{'c':_0x3d9cbe(0x472),'s':_0x3d9cbe(0x3a5)},{'c':_0x3d9cbe(0x222),'s':_0x3d9cbe(0x44c)},{'c':'شمس','s':_0x3d9cbe(0x1e2)},{'c':_0x3d9cbe(0x586),'s':_0x3d9cbe(0x5cc)},{'c':'سحاب','s':_0x3d9cbe(0x5a9)},{'c':_0x3d9cbe(0x1d6),'s':_0x3d9cbe(0x5ae)},{'c':_0x3d9cbe(0x260),'s':_0x3d9cbe(0x5c7)},{'c':'بركان','s':_0x3d9cbe(0x409)},{'c':_0x3d9cbe(0x3ce),'s':_0x3d9cbe(0x1d9)},{'c':_0x3d9cbe(0x1fb),'s':_0x3d9cbe(0x4e2)},{'c':_0x3d9cbe(0x460),'s':_0x3d9cbe(0x2f3)},{'c':_0x3d9cbe(0x5df),'s':'ع\x20ش\x20ر\x20ا'},{'c':_0x3d9cbe(0x43a),'s':_0x3d9cbe(0x1df)},{'c':'مسجد','s':_0x3d9cbe(0x291)},{'c':'مدرسة','s':_0x3d9cbe(0x57a)},{'c':_0x3d9cbe(0x3ad),'s':_0x3d9cbe(0x582)},{'c':_0x3d9cbe(0x33c),'s':_0x3d9cbe(0x446)},{'c':_0x3d9cbe(0x58d),'s':_0x3d9cbe(0x4a1)},{'c':_0x3d9cbe(0x59e),'s':'ع\x20ر\x20م\x20ز\x20ة'},{'c':_0x3d9cbe(0x546),'s':_0x3d9cbe(0x515)},{'c':'متحف','s':_0x3d9cbe(0x2c6)},{'c':'مسرح','s':_0x3d9cbe(0x4b5)},{'c':_0x3d9cbe(0x585),'s':_0x3d9cbe(0x47d)},{'c':_0x3d9cbe(0x4b8),'s':_0x3d9cbe(0x2e8)},{'c':_0x3d9cbe(0x2e1),'s':_0x3d9cbe(0x46f)},{'c':_0x3d9cbe(0x4aa),'s':_0x3d9cbe(0x453)},{'c':_0x3d9cbe(0x45e),'s':_0x3d9cbe(0x2b4)},{'c':'صخرة','s':_0x3d9cbe(0x5a5)},{'c':_0x3d9cbe(0x373),'s':_0x3d9cbe(0x5e2)},{'c':_0x3d9cbe(0x236),'s':'ف\x20و\x20ر\x20ا\x20ن\x20ة'},{'c':_0x3d9cbe(0x29c),'s':_0x3d9cbe(0x209)},{'c':'غيمة','s':_0x3d9cbe(0x3dc)},{'c':'أفق','s':_0x3d9cbe(0x5d1)},{'c':'محيط','s':'ح\x20ي\x20ط\x20م'},{'c':'نبع','s':'ب\x20ن\x20ع'}]},'c8':{'name':_0x3d9cbe(0x282),'icon':'⚽','words':[{'c':'كرة','s':'ر\x20ك\x20ة'},{'c':_0x3d9cbe(0x1f5),'s':_0x3d9cbe(0x4f5)},{'c':_0x3d9cbe(0x58d),'s':_0x3d9cbe(0x4e1)},{'c':_0x3d9cbe(0x400),'s':_0x3d9cbe(0x3c9)},{'c':_0x3d9cbe(0x463),'s':_0x3d9cbe(0x45b)},{'c':_0x3d9cbe(0x29d),'s':_0x3d9cbe(0x555)},{'c':_0x3d9cbe(0x521),'s':_0x3d9cbe(0x4cb)},{'c':_0x3d9cbe(0x4cf),'s':_0x3d9cbe(0x5b9)},{'c':'ميدالية','s':_0x3d9cbe(0x5c1)},{'c':_0x3d9cbe(0x35d),'s':'د\x20ر\x20ب\x20م'},{'c':'تمرين','s':'ر\x20ي\x20ن\x20م\x20ت'},{'c':'لياقة','s':_0x3d9cbe(0x3e4)},{'c':_0x3d9cbe(0x557),'s':_0x3d9cbe(0x594)},{'c':_0x3d9cbe(0x2b8),'s':_0x3d9cbe(0x539)},{'c':'رماية','s':_0x3d9cbe(0x350)},{'c':'سباق','s':_0x3d9cbe(0x41d)},{'c':_0x3d9cbe(0x1dd),'s':'ن\x20س\x20ت'},{'c':_0x3d9cbe(0x5da),'s':_0x3d9cbe(0x30e)},{'c':'كرة\x20طائرة','s':_0x3d9cbe(0x3ac)},{'c':_0x3d9cbe(0x244),'s':_0x3d9cbe(0x3a3)},{'c':_0x3d9cbe(0x227),'s':_0x3d9cbe(0x311)},{'c':_0x3d9cbe(0x282),'s':_0x3d9cbe(0x1ee)},{'c':_0x3d9cbe(0x28d),'s':_0x3d9cbe(0x5e3)},{'c':_0x3d9cbe(0x201),'s':_0x3d9cbe(0x287)},{'c':_0x3d9cbe(0x560),'s':_0x3d9cbe(0x5d9)},{'c':_0x3d9cbe(0x394),'s':'ل\x20س\x20ل\x20ت'},{'c':'دفاع','s':_0x3d9cbe(0x2a6)},{'c':_0x3d9cbe(0x24e),'s':'ج\x20و\x20م\x20ه'},{'c':_0x3d9cbe(0x439),'s':_0x3d9cbe(0x2b5)},{'c':_0x3d9cbe(0x290),'s':_0x3d9cbe(0x45d)},{'c':_0x3d9cbe(0x2cb),'s':_0x3d9cbe(0x1cf)},{'c':_0x3d9cbe(0x33e),'s':_0x3d9cbe(0x3ba)},{'c':_0x3d9cbe(0x2b9),'s':'م\x20ب\x20ا\x20ز\x20ج'},{'c':_0x3d9cbe(0x457),'s':_0x3d9cbe(0x320)},{'c':_0x3d9cbe(0x2af),'s':'ط\x20ن\x20ة\x20ق'},{'c':_0x3d9cbe(0x4fd),'s':_0x3d9cbe(0x1c9)},{'c':_0x3d9cbe(0x281),'s':'ا\x20ن\x20ب\x20ت\x20ك'}]},'c9':{'name':'منوعات','icon':'💡','words':[{'c':'إنترنت','s':'ر\x20ن\x20ت\x20إ\x20ن\x20ت'},{'c':_0x3d9cbe(0x34d),'s':'ع\x20م\x20ل\x20و\x20ا\x20ت\x20م'},{'c':_0x3d9cbe(0x295),'s':_0x3d9cbe(0x2a2)},{'c':'تاريخ','s':'خ\x20ر\x20ي\x20ت\x20ا'},{'c':_0x3d9cbe(0x2ca),'s':_0x3d9cbe(0x581)},{'c':_0x3d9cbe(0x317),'s':_0x3d9cbe(0x2d6)},{'c':_0x3d9cbe(0x531),'s':_0x3d9cbe(0x5b6)},{'c':'نجاح','s':_0x3d9cbe(0x2fb)},{'c':'عائلة','s':_0x3d9cbe(0x2cc)},{'c':_0x3d9cbe(0x1ec),'s':_0x3d9cbe(0x5a0)},{'c':'تسويق','s':_0x3d9cbe(0x559)},{'c':_0x3d9cbe(0x308),'s':_0x3d9cbe(0x21f)},{'c':_0x3d9cbe(0x39c),'s':_0x3d9cbe(0x47c)},{'c':_0x3d9cbe(0x32d),'s':'ل\x20س\x20ة\x20ر\x20ا'},{'c':_0x3d9cbe(0x522),'s':_0x3d9cbe(0x22f)},{'c':_0x3d9cbe(0x259),'s':_0x3d9cbe(0x43e)},{'c':_0x3d9cbe(0x5a2),'s':'ب\x20ك\x20ة\x20ش'},{'c':'تطبيق','s':'ط\x20ب\x20ق\x20ي\x20ت'},{'c':_0x3d9cbe(0x41a),'s':'ح\x20ا\x20ن\x20ش'},{'c':_0x3d9cbe(0x3a6),'s':_0x3d9cbe(0x234)},{'c':_0x3d9cbe(0x3c2),'s':_0x3d9cbe(0x243)},{'c':_0x3d9cbe(0x26a),'s':_0x3d9cbe(0x27a)},{'c':_0x3d9cbe(0x437),'s':_0x3d9cbe(0x2a7)},{'c':'مسلسل','s':'ل\x20ل\x20س\x20م\x20س'},{'c':_0x3d9cbe(0x500),'s':_0x3d9cbe(0x4bb)},{'c':_0x3d9cbe(0x465),'s':'ل\x20ب\x20ق'},{'c':_0x3d9cbe(0x42d),'s':_0x3d9cbe(0x269)},{'c':_0x3d9cbe(0x402),'s':_0x3d9cbe(0x3bc)},{'c':'استراتيجية','s':'ا\x20ي\x20ت\x20س\x20ر\x20ا\x20ج\x20ي\x20ة\x20ت'},{'c':_0x3d9cbe(0x20c),'s':_0x3d9cbe(0x2f8)},{'c':_0x3d9cbe(0x545),'s':_0x3d9cbe(0x323)},{'c':_0x3d9cbe(0x541),'s':_0x3d9cbe(0x352)},{'c':_0x3d9cbe(0x204),'s':'ن\x20و\x20ن\x20ا\x20ق'},{'c':_0x3d9cbe(0x1fa),'s':'د\x20ة\x20ي\x20ج\x20ر'},{'c':_0x3d9cbe(0x49c),'s':_0x3d9cbe(0x477)},{'c':_0x3d9cbe(0x5b3),'s':_0x3d9cbe(0x351)},{'c':'قرار','s':_0x3d9cbe(0x38c)},{'c':_0x3d9cbe(0x28b),'s':_0x3d9cbe(0x253)},{'c':_0x3d9cbe(0x2f9),'s':_0x3d9cbe(0x1c7)}]},'c10':{'name':'موضة','icon':'🧥','words':[{'c':_0x3d9cbe(0x4d3),'s':'ص\x20ق\x20ي\x20م'},{'c':_0x3d9cbe(0x2ea),'s':'و\x20ن\x20ل\x20ط\x20ب\x20ن'},{'c':_0x3d9cbe(0x505),'s':_0x3d9cbe(0x5ca)},{'c':_0x3d9cbe(0x3f9),'s':_0x3d9cbe(0x518)},{'c':_0x3d9cbe(0x374),'s':_0x3d9cbe(0x4e9)},{'c':_0x3d9cbe(0x33b),'s':_0x3d9cbe(0x35c)},{'c':_0x3d9cbe(0x584),'s':'د\x20ل\x20ة\x20ق\x20ا'},{'c':_0x3d9cbe(0x3e2),'s':_0x3d9cbe(0x26c)},{'c':_0x3d9cbe(0x324),'s':_0x3d9cbe(0x440)},{'c':_0x3d9cbe(0x4ff),'s':'ا\x20ذ\x20ح\x20ء'},{'c':_0x3d9cbe(0x48f),'s':_0x3d9cbe(0x5d2)},{'c':_0x3d9cbe(0x2fa),'s':_0x3d9cbe(0x58b)},{'c':_0x3d9cbe(0x5d4),'s':_0x3d9cbe(0x2a8)},{'c':_0x3d9cbe(0x436),'s':_0x3d9cbe(0x2df)},{'c':_0x3d9cbe(0x296),'s':_0x3d9cbe(0x598)},{'c':_0x3d9cbe(0x250),'s':'ق\x20ب\x20ة\x20ع'},{'c':_0x3d9cbe(0x39e),'s':_0x3d9cbe(0x2d2)},{'c':_0x3d9cbe(0x4a3),'s':_0x3d9cbe(0x3d9)},{'c':_0x3d9cbe(0x536),'s':_0x3d9cbe(0x342)},{'c':_0x3d9cbe(0x377),'s':'ر\x20ع\x20ط'},{'c':_0x3d9cbe(0x25d),'s':_0x3d9cbe(0x327)},{'c':_0x3d9cbe(0x26f),'s':'ع\x20ق\x20ر\x20ب\x20ط\x20ة\x20ن'},{'c':_0x3d9cbe(0x4d2),'s':_0x3d9cbe(0x28c)},{'c':'خيط','s':_0x3d9cbe(0x4bc)},{'c':_0x3d9cbe(0x369),'s':_0x3d9cbe(0x55c)},{'c':'بجامة','s':_0x3d9cbe(0x534)},{'c':_0x3d9cbe(0x4ef),'s':_0x3d9cbe(0x2d0)},{'c':_0x3d9cbe(0x5d3),'s':_0x3d9cbe(0x4fe)},{'c':'زينة','s':_0x3d9cbe(0x279)},{'c':_0x3d9cbe(0x2d1),'s':_0x3d9cbe(0x23d)},{'c':_0x3d9cbe(0x51e),'s':_0x3d9cbe(0x1cb)},{'c':_0x3d9cbe(0x5ac),'s':_0x3d9cbe(0x558)},{'c':_0x3d9cbe(0x356),'s':_0x3d9cbe(0x2e4)},{'c':_0x3d9cbe(0x42f),'s':'د\x20ل\x20ص\x20ن'}]},'c11':{'name':_0x3d9cbe(0x1fd),'icon':'❤️','words':[{'c':_0x3d9cbe(0x531),'s':_0x3d9cbe(0x2b1)},{'c':_0x3d9cbe(0x3e7),'s':_0x3d9cbe(0x32e)},{'c':_0x3d9cbe(0x365),'s':'ض\x20ب\x20غ'},{'c':_0x3d9cbe(0x3bd),'s':_0x3d9cbe(0x306)},{'c':_0x3d9cbe(0x4f3),'s':'ر\x20ح\x20ف'},{'c':_0x3d9cbe(0x4fb),'s':_0x3d9cbe(0x207)},{'c':_0x3d9cbe(0x25f),'s':_0x3d9cbe(0x5c6)},{'c':'حب','s':_0x3d9cbe(0x294)},{'c':'كراهية','s':_0x3d9cbe(0x3e1)},{'c':_0x3d9cbe(0x1fd),'s':_0x3d9cbe(0x248)},{'c':_0x3d9cbe(0x355),'s':_0x3d9cbe(0x5dd)},{'c':'دهشة','s':_0x3d9cbe(0x4ab)},{'c':_0x3d9cbe(0x257),'s':'ل\x20م\x20ل'},{'c':_0x3d9cbe(0x1ff),'s':_0x3d9cbe(0x1e4)},{'c':_0x3d9cbe(0x3e9),'s':_0x3d9cbe(0x56d)},{'c':_0x3d9cbe(0x289),'s':_0x3d9cbe(0x4c9)},{'c':_0x3d9cbe(0x22b),'s':'و\x20د\x20ء\x20ه'},{'c':_0x3d9cbe(0x2c4),'s':_0x3d9cbe(0x3a8)},{'c':_0x3d9cbe(0x1ec),'s':_0x3d9cbe(0x21b)},{'c':_0x3d9cbe(0x41e),'s':_0x3d9cbe(0x334)},{'c':_0x3d9cbe(0x54e),'s':_0x3d9cbe(0x34c)},{'c':'عاطفة','s':_0x3d9cbe(0x1ef)},{'c':_0x3d9cbe(0x2b3),'s':'ف\x20ق\x20ش\x20ة'},{'c':_0x3d9cbe(0x37b),'s':_0x3d9cbe(0x24c)},{'c':_0x3d9cbe(0x220),'s':_0x3d9cbe(0x3be)},{'c':_0x3d9cbe(0x48c),'s':'خ\x20ر\x20ف'},{'c':_0x3d9cbe(0x422),'s':_0x3d9cbe(0x526)},{'c':_0x3d9cbe(0x449),'s':_0x3d9cbe(0x252)},{'c':'انزعاج','s':_0x3d9cbe(0x49f)},{'c':_0x3d9cbe(0x2be),'s':_0x3d9cbe(0x5bd)},{'c':_0x3d9cbe(0x532),'s':'ج\x20ل\x20خ'},{'c':'تضحية','s':_0x3d9cbe(0x2d7)},{'c':_0x3d9cbe(0x5d8),'s':'م\x20ل\x20ا\x20س'},{'c':_0x3d9cbe(0x562),'s':'ن\x20ة\x20ي\x20ط\x20م\x20ن\x20أ\x20ن\x20ي'},{'c':_0x3d9cbe(0x2e0),'s':_0x3d9cbe(0x263)},{'c':'ود','s':_0x3d9cbe(0x22d)},{'c':'كآبة','s':_0x3d9cbe(0x27d)},{'c':_0x3d9cbe(0x300),'s':_0x3d9cbe(0x441)},{'c':_0x3d9cbe(0x43d),'s':_0x3d9cbe(0x2c0)},{'c':'حماس','s':_0x3d9cbe(0x4ac)}]},'c12':{'name':_0x3d9cbe(0x230),'icon':'🏃','words':[{'c':_0x3d9cbe(0x433),'s':'ج\x20ي\x20ر\x20ي'},{'c':_0x3d9cbe(0x59b),'s':'ت\x20ك\x20ب\x20ي'},{'c':'يقرأ','s':_0x3d9cbe(0x5a7)},{'c':_0x3d9cbe(0x28f),'s':_0x3d9cbe(0x471)},{'c':_0x3d9cbe(0x3ea),'s':_0x3d9cbe(0x47a)},{'c':_0x3d9cbe(0x2ac),'s':_0x3d9cbe(0x51a)},{'c':'يتكلم','s':'ك\x20ل\x20م\x20ت\x20ي'},{'c':_0x3d9cbe(0x3c4),'s':_0x3d9cbe(0x2d4)},{'c':_0x3d9cbe(0x482),'s':'د\x20ر\x20س\x20ي'},{'c':_0x3d9cbe(0x5d5),'s':_0x3d9cbe(0x329)},{'c':_0x3d9cbe(0x305),'s':_0x3d9cbe(0x591)},{'c':_0x3d9cbe(0x473),'s':_0x3d9cbe(0x489)},{'c':_0x3d9cbe(0x27b),'s':_0x3d9cbe(0x4f7)},{'c':_0x3d9cbe(0x1ce),'s':_0x3d9cbe(0x240)},{'c':_0x3d9cbe(0x492),'s':_0x3d9cbe(0x456)},{'c':_0x3d9cbe(0x3fc),'s':'م\x20ع\x20ل\x20ي'},{'c':_0x3d9cbe(0x22a),'s':_0x3d9cbe(0x321)},{'c':_0x3d9cbe(0x450),'s':_0x3d9cbe(0x54b)},{'c':'يبتسم','s':_0x3d9cbe(0x49e)},{'c':'يستكشف','s':_0x3d9cbe(0x3d2)},{'c':_0x3d9cbe(0x370),'s':_0x3d9cbe(0x3e6)},{'c':_0x3d9cbe(0x381),'s':_0x3d9cbe(0x54a)},{'c':_0x3d9cbe(0x219),'s':'ف\x20ز\x20ق\x20ي'},{'c':_0x3d9cbe(0x512),'s':_0x3d9cbe(0x528)},{'c':'يغني','s':_0x3d9cbe(0x229)},{'c':_0x3d9cbe(0x407),'s':'ق\x20ص\x20ر\x20ي'},{'c':'يصور','s':_0x3d9cbe(0x2b2)},{'c':'يحسب','s':_0x3d9cbe(0x5b4)},{'c':'يقارن','s':_0x3d9cbe(0x202)},{'c':'يحل','s':_0x3d9cbe(0x4ba)},{'c':_0x3d9cbe(0x2ec),'s':_0x3d9cbe(0x41b)},{'c':'يشتري','s':'ش\x20ت\x20ر\x20ي\x20ي'},{'c':_0x3d9cbe(0x37a),'s':_0x3d9cbe(0x333)},{'c':_0x3d9cbe(0x29b),'s':_0x3d9cbe(0x3cb)},{'c':'يجمع','s':_0x3d9cbe(0x5d0)},{'c':_0x3d9cbe(0x25c),'s':_0x3d9cbe(0x36d)},{'c':'يضرب','s':'ض\x20ر\x20ب\x20ي'},{'c':_0x3d9cbe(0x593),'s':'ظ\x20ق\x20س\x20ي\x20ي\x20ت'},{'c':_0x3d9cbe(0x37d),'s':_0x3d9cbe(0x275)},{'c':_0x3d9cbe(0x566),'s':_0x3d9cbe(0x2ed)}]},'c13':{'name':'منزل','icon':'🏠','words':[{'c':'ثلاجة','s':_0x3d9cbe(0x1ed)},{'c':_0x3d9cbe(0x466),'s':_0x3d9cbe(0x5ce)},{'c':_0x3d9cbe(0x3dd),'s':_0x3d9cbe(0x23a)},{'c':_0x3d9cbe(0x395),'s':_0x3d9cbe(0x286)},{'c':'تلفاز','s':_0x3d9cbe(0x2a3)},{'c':_0x3d9cbe(0x35a),'s':_0x3d9cbe(0x2f2)},{'c':_0x3d9cbe(0x225),'s':_0x3d9cbe(0x37c)},{'c':_0x3d9cbe(0x337),'s':'س\x20ر\x20ي\x20ك'},{'c':_0x3d9cbe(0x525),'s':_0x3d9cbe(0x213)},{'c':_0x3d9cbe(0x1c8),'s':_0x3d9cbe(0x235)},{'c':'كنب','s':_0x3d9cbe(0x2ab)},{'c':_0x3d9cbe(0x354),'s':_0x3d9cbe(0x496)},{'c':_0x3d9cbe(0x261),'s':_0x3d9cbe(0x45a)},{'c':_0x3d9cbe(0x3d1),'s':_0x3d9cbe(0x5b2)},{'c':'مصباح','s':_0x3d9cbe(0x5c0)},{'c':_0x3d9cbe(0x33f),'s':'ر\x20ا\x20س\x20ت\x20ة'},{'c':_0x3d9cbe(0x5b0),'s':_0x3d9cbe(0x2f7)},{'c':'شمعدان','s':_0x3d9cbe(0x2e5)},{'c':'صحن','s':_0x3d9cbe(0x31a)},{'c':'كوب','s':'و\x20b\x20ك'},{'c':_0x3d9cbe(0x3d0),'s':_0x3d9cbe(0x445)},{'c':'شوكة','s':_0x3d9cbe(0x5e0)},{'c':_0x3d9cbe(0x1dc),'s':'ن\x20ك\x20ي\x20س'},{'c':_0x3d9cbe(0x2ad),'s':'b\x20ر\x20q\x20إ\x20ي'},{'c':'منشفة','s':'f\x20ش\x20ن\x20م\x20ة'},{'c':_0x3d9cbe(0x48e),'s':'و\x20b\x20ن\x20ص\x20ا'},{'c':_0x3d9cbe(0x41a),'s':_0x3d9cbe(0x510)},{'c':'ريموت','s':_0x3d9cbe(0x42a)},{'c':_0x3d9cbe(0x4ed),'s':'ط\x20س\x20ا\x20ن\x20غ\x20م\x20ي'},{'c':_0x3d9cbe(0x29a),'s':_0x3d9cbe(0x346)},{'c':_0x3d9cbe(0x3ca),'s':_0x3d9cbe(0x30c)},{'c':_0x3d9cbe(0x366),'s':'د\x20q\x20و\x20م'},{'c':'سخان','s':'خ\x20n\x20س\x20ا'},{'c':_0x3d9cbe(0x25a),'s':_0x3d9cbe(0x364)},{'c':_0x3d9cbe(0x380),'s':'م\x20ع\x20ة\x20ش'},{'c':_0x3d9cbe(0x429),'s':_0x3d9cbe(0x4d8)},{'c':_0x3d9cbe(0x375),'s':_0x3d9cbe(0x314)},{'c':_0x3d9cbe(0x540),'s':'f\x20ا\x20ه\x20ت'}]},'c14':{'name':_0x3d9cbe(0x43b),'icon':'🏷️','words':[{'c':_0x3d9cbe(0x2c9),'s':_0x3d9cbe(0x3a4)},{'c':_0x3d9cbe(0x388),'s':'س\x20ج\x20ن\x20و\x20ا\x20س\x20م'},{'c':'هواوي','s':_0x3d9cbe(0x357)},{'c':_0x3d9cbe(0x425),'s':'ت\x20ا\x20و\x20ت\x20و\x20ي'},{'c':_0x3d9cbe(0x246),'s':_0x3d9cbe(0x217)},{'c':_0x3d9cbe(0x3cd),'s':_0x3d9cbe(0x53d)},{'c':'أديداس','s':_0x3d9cbe(0x4fc)},{'c':'أمازون','s':'م\x20ز\x20ا\x20و\x20ن\x20أ'},{'c':'جوجل','s':_0x3d9cbe(0x3fe)},{'c':'مايكروسوفت','s':_0x3d9cbe(0x4ee)},{'c':_0x3d9cbe(0x480),'s':_0x3d9cbe(0x4eb)},{'c':_0x3d9cbe(0x4d0),'s':_0x3d9cbe(0x444)},{'c':_0x3d9cbe(0x419),'s':_0x3d9cbe(0x325)},{'c':_0x3d9cbe(0x418),'s':'د\x20و\x20ز\x20ا\x20م\x20ك\x20ن\x20د\x20ل'},{'c':'كنتاكي','s':_0x3d9cbe(0x493)},{'c':'فيراري','s':_0x3d9cbe(0x4e7)},{'c':_0x3d9cbe(0x572),'s':_0x3d9cbe(0x3e0)},{'c':'شانيل','s':_0x3d9cbe(0x53b)},{'c':_0x3d9cbe(0x2ce),'s':_0x3d9cbe(0x455)},{'c':_0x3d9cbe(0x33d),'s':_0x3d9cbe(0x1cd)},{'c':'فيس\x20بوك','s':_0x3d9cbe(0x262)},{'c':_0x3d9cbe(0x5a6),'s':_0x3d9cbe(0x520)},{'c':_0x3d9cbe(0x5a1),'s':_0x3d9cbe(0x458)},{'c':'نيتفليكس','s':_0x3d9cbe(0x589)},{'c':_0x3d9cbe(0x59c),'s':_0x3d9cbe(0x2e3)},{'c':_0x3d9cbe(0x554),'s':_0x3d9cbe(0x2ff)},{'c':_0x3d9cbe(0x249),'s':_0x3d9cbe(0x5cf)},{'c':_0x3d9cbe(0x3f5),'s':_0x3d9cbe(0x4e8)},{'c':_0x3d9cbe(0x3d4),'s':_0x3d9cbe(0x5af)},{'c':_0x3d9cbe(0x1d3),'s':'ا\x20ك\x20م'}]},'c15':{'name':_0x3d9cbe(0x2d5),'icon':'🎬','words':[{'c':'محمد\x20صلاح','s':_0x3d9cbe(0x48d)},{'c':'كريستيانو\x20رونالدو','s':'و\x20ر\x20ا\x20ن\x20و\x20ن\x20ك\x20ر\x20س\x20ت\x20ي\x20ل\x20د\x20و'},{'c':_0x3d9cbe(0x597),'s':_0x3d9cbe(0x3b3)},{'c':_0x3d9cbe(0x44d),'s':_0x3d9cbe(0x4b4)},{'c':_0x3d9cbe(0x565),'s':_0x3d9cbe(0x494)},{'c':'توم\x20كروز','s':_0x3d9cbe(0x299)},{'c':_0x3d9cbe(0x5e1),'s':_0x3d9cbe(0x39f)},{'c':_0x3d9cbe(0x57d),'s':_0x3d9cbe(0x2fc)},{'c':_0x3d9cbe(0x34a),'s':_0x3d9cbe(0x288)},{'c':_0x3d9cbe(0x1f6),'s':_0x3d9cbe(0x309)},{'c':_0x3d9cbe(0x3b0),'s':'س\x20ب\x20ر\x20ي\x20ن\x20ص\x20م\x20ي\x20ا'},{'c':_0x3d9cbe(0x519),'s':_0x3d9cbe(0x59a)},{'c':_0x3d9cbe(0x23c),'s':_0x3d9cbe(0x231)},{'c':_0x3d9cbe(0x52d),'s':_0x3d9cbe(0x427)},{'c':_0x3d9cbe(0x40f),'s':'ع\x20ج\x20ر\x20م\x20ن\x20ا\x20ن\x20ي\x20س'},{'c':'إليسا','s':'ل\x20ي\x20س\x20ا\x20إ'},{'c':'ماجد\x20المهندس','s':_0x3d9cbe(0x56b)},{'c':'عمرو\x20دياب','s':_0x3d9cbe(0x25e)},{'c':_0x3d9cbe(0x21c),'s':_0x3d9cbe(0x2d8)},{'c':'نجوى\x20كرم','s':'ك\x20ر\x20م\x20ن\x20ج\x20و\x20ى'},{'c':_0x3d9cbe(0x3ae),'s':_0x3d9cbe(0x4a4)},{'c':_0x3d9cbe(0x42e),'s':_0x3d9cbe(0x389)},{'c':_0x3d9cbe(0x36f),'s':'ص\x20ا\x20ل\x20ة\x20أ'},{'c':_0x3d9cbe(0x4c2),'s':_0x3d9cbe(0x5c4)},{'c':_0x3d9cbe(0x576),'s':'س\x20ع\x20ب\x20د\x20ن\x20و\x20ر\x20ي\x20ر\x20ي\x20ن'},{'c':_0x3d9cbe(0x401),'s':'س\x20م\x20ي\x20ث\x20و\x20ل\x20ي'},{'c':_0x3d9cbe(0x417),'s':_0x3d9cbe(0x5bc)},{'c':_0x3d9cbe(0x360),'s':_0x3d9cbe(0x501)},{'c':_0x3d9cbe(0x393),'s':_0x3d9cbe(0x550)},{'c':_0x3d9cbe(0x4cd),'s':_0x3d9cbe(0x1e7)}]},'c16':{'name':'مسلسلات','icon':'📺','words':[{'c':'باب\x20الحارة','s':'ح\x20ا\x20ر\x20ل\x20ب\x20ا\x20ة\x20ا\x20ب\x20ب'},{'c':_0x3d9cbe(0x547),'s':_0x3d9cbe(0x319)},{'c':_0x3d9cbe(0x431),'s':_0x3d9cbe(0x47b)},{'c':'طاش\x20ما\x20طاش','s':_0x3d9cbe(0x40b)},{'c':_0x3d9cbe(0x3fd),'s':_0x3d9cbe(0x3d8)},{'c':_0x3d9cbe(0x5aa),'s':_0x3d9cbe(0x587)},{'c':_0x3d9cbe(0x233),'s':_0x3d9cbe(0x338)},{'c':_0x3d9cbe(0x5a4),'s':_0x3d9cbe(0x5c2)},{'c':_0x3d9cbe(0x54f),'s':_0x3d9cbe(0x40e)},{'c':'سنوات\x20الضياع','s':_0x3d9cbe(0x55a)},{'c':_0x3d9cbe(0x349),'s':_0x3d9cbe(0x31f)},{'c':_0x3d9cbe(0x404),'s':'ذ\x20ا\x20ب\x20ي\x20و\x20د\x20ل\x20ا\x20ل\x20ئ'},{'c':_0x3d9cbe(0x322),'s':_0x3d9cbe(0x2e7)},{'c':_0x3d9cbe(0x462),'s':_0x3d9cbe(0x3b8)},{'c':_0x3d9cbe(0x55b),'s':_0x3d9cbe(0x451)},{'c':_0x3d9cbe(0x511),'s':'د\x20ن\x20ل\x20ا\x20ز'},{'c':_0x3d9cbe(0x530),'s':'د\x20ل\x20ا\x20ع\x20ه'},{'c':_0x3d9cbe(0x4e6),'s':_0x3d9cbe(0x37e)},{'c':_0x3d9cbe(0x278),'s':'ل\x20ح\x20ر\x20ة\x20ل\x20ا'},{'c':_0x3d9cbe(0x303),'s':_0x3d9cbe(0x4d7)},{'c':_0x3d9cbe(0x3df),'s':_0x3d9cbe(0x2a1)},{'c':_0x3d9cbe(0x2cd),'s':'ب\x20و\x20ل\x20ا\x20م\x20ل\x20ي\x20ي\x20ن\x20ا\x20أ'},{'c':_0x3d9cbe(0x4d1),'s':'ا\x20و\x20ت\x20ي\x20ل\x20ا\x20ن\x20د\x20ر\x20غ'},{'c':'ذئاب\x20الجبل','s':_0x3d9cbe(0x254)},{'c':_0x3d9cbe(0x32c),'s':_0x3d9cbe(0x390)},{'c':_0x3d9cbe(0x573),'s':'ي\x20ل\x20و\x20ه\x20ج\x20ا\x20ن\x20م\x20ي\x20ء'},{'c':_0x3d9cbe(0x3a1),'s':'ر\x20س\x20ن\x20ل\x20ب\x20ا'},{'c':'خمس\x20نجوم','s':_0x3d9cbe(0x430)},{'c':_0x3d9cbe(0x4ec),'s':_0x3d9cbe(0x2f0)},{'c':_0x3d9cbe(0x2eb),'s':_0x3d9cbe(0x341)},{'c':_0x3d9cbe(0x596),'s':'خ\x20ا\x20ل\x20ق\x20ت\x20ي\x20م\x20ا\x20ش\x20ة'},{'c':_0x3d9cbe(0x50f),'s':'ع\x20ي\x20د\x20ل\x20ا\x20و\x20ر\x20ح\x20ل'},{'c':_0x3d9cbe(0x1ca),'s':_0x3d9cbe(0x1d2)},{'c':'ساق\x20البامبو','s':_0x3d9cbe(0x570)},{'c':_0x3d9cbe(0x47f),'s':_0x3d9cbe(0x538)},{'c':'الرحى','s':_0x3d9cbe(0x479)},{'c':'قلوب\x20للإيجار','s':_0x3d9cbe(0x41c)},{'c':_0x3d9cbe(0x504),'s':_0x3d9cbe(0x3de)},{'c':_0x3d9cbe(0x2da),'s':_0x3d9cbe(0x3b5)},{'c':_0x3d9cbe(0x265),'s':'ع\x20ج\x20ي\x20ت\x20ص\x20و\x20ف\x20ل\x20ا'}]}};var appState={'isPremium':localStorage[_0x3d9cbe(0x3af)](_0x3d9cbe(0x208))===_0x3d9cbe(0x274),'gamesPlayed':parseInt(localStorage['getItem'](_0x3d9cbe(0x4b0))||'0')},usedWords=JSON['parse'](localStorage['getItem'](_0x3d9cbe(0x2c5))||'{}'),gameSession={'words':[],'currentIndex':0x0,'score':{},'timer':null,'timeLeft':0x1e,'isPaused':![]},selectedCats=[],currentTheme=_0x3d9cbe(0x232),players=[];window[_0x3d9cbe(0x5b5)]=()=>{setTimeout(()=>{const _0x259fd4=_0x12fa,_0xbf2e9a=document[_0x259fd4(0x58c)](_0x259fd4(0x378));_0xbf2e9a[_0x259fd4(0x24b)]['opacity']='0',setTimeout(()=>{const _0x579a40=_0x259fd4;_0xbf2e9a[_0x579a40(0x214)][_0x579a40(0x276)](_0x579a40(0x284)),updateUI();},0x1f4);},0xbb8);};function updateUI(){const _0x5dc8da=_0x3d9cbe;document['getElementById'](_0x5dc8da(0x5b1))[_0x5dc8da(0x24b)]['display']='flex';if(appState[_0x5dc8da(0x1cc)])document[_0x5dc8da(0x58c)](_0x5dc8da(0x30a))[_0x5dc8da(0x3d5)]=_0x5dc8da(0x50e),document[_0x5dc8da(0x58c)]('statusBadge')[_0x5dc8da(0x24b)][_0x5dc8da(0x33a)]=_0x5dc8da(0x3ff),document[_0x5dc8da(0x58c)](_0x5dc8da(0x30a))['style']['color']='black',document[_0x5dc8da(0x58c)](_0x5dc8da(0x2ba))[_0x5dc8da(0x331)]=_0x5dc8da(0x2d3);else{const _0x248a97=Math[_0x5dc8da(0x578)](0x0,0x1-appState[_0x5dc8da(0x486)]);document[_0x5dc8da(0x58c)](_0x5dc8da(0x3c3))[_0x5dc8da(0x3d5)]=_0x248a97,_0x248a97===0x0&&(document[_0x5dc8da(0x58c)]('freeGamesInfo')['innerHTML']=_0x5dc8da(0x3e5));}}document[_0x3d9cbe(0x58c)](_0x3d9cbe(0x475))['onclick']=()=>{const _0x4c079a=_0x3d9cbe;!appState[_0x4c079a(0x1cc)]&&appState[_0x4c079a(0x486)]>=0x1?showActivationModal():(document['getElementById'](_0x4c079a(0x5b1))[_0x4c079a(0x24b)][_0x4c079a(0x218)]='none',setupCategories(),document[_0x4c079a(0x58c)](_0x4c079a(0x36c))[_0x4c079a(0x24b)][_0x4c079a(0x218)]=_0x4c079a(0x509));};function showActivationModal(){const _0xa303bd=_0x3d9cbe;document['getElementById'](_0xa303bd(0x595))['style']['display']=_0xa303bd(0x509),document[_0xa303bd(0x58c)](_0xa303bd(0x40a))[_0xa303bd(0x24b)]['display']=_0xa303bd(0x1db);}function closeActivationModal(){const _0x31394c=_0x3d9cbe;document[_0x31394c(0x58c)]('activationModal')[_0x31394c(0x24b)][_0x31394c(0x218)]=_0x31394c(0x1db);}function validateCode(){const _0x4e658b=_0x3d9cbe,_0x1cbd61=document[_0x4e658b(0x58c)]('activationCodeInput')[_0x4e658b(0x443)][_0x4e658b(0x3b4)]()[_0x4e658b(0x237)]();let _0x156366=_0x1cbd61[_0x4e658b(0x2c7)](/\d/g),_0x3276f0=_0x156366?_0x156366['reduce']((_0x2cf90e,_0x3204a3)=>_0x2cf90e+parseInt(_0x3204a3),0x0):0x0,_0x534fb9=_0x1cbd61[_0x4e658b(0x332)](_0x4e658b(0x316))&&_0x3276f0===0x14;_0x534fb9?(appState[_0x4e658b(0x1cc)]=!![],localStorage[_0x4e658b(0x1da)](_0x4e658b(0x208),_0x4e658b(0x274)),alert(_0x4e658b(0x432)),closeActivationModal(),updateUI()):document[_0x4e658b(0x58c)](_0x4e658b(0x40a))[_0x4e658b(0x24b)][_0x4e658b(0x218)]=_0x4e658b(0x1fc);}function setupCategories(){const _0x2272d9=_0x3d9cbe,_0x50b1a2=document[_0x2272d9(0x58c)](_0x2272d9(0x3c6));_0x50b1a2[_0x2272d9(0x331)]='',selectedCats=[],Object[_0x2272d9(0x563)](FULL_DATA)['forEach'](([_0x2e41db,_0x272108])=>{const _0x501891=_0x2272d9,_0x59ca15=document[_0x501891(0x1e5)](_0x501891(0x2ee));_0x59ca15[_0x501891(0x499)]=_0x501891(0x258),_0x59ca15[_0x501891(0x331)]=_0x501891(0x588)+_0x272108[_0x501891(0x363)]+_0x501891(0x31e)+_0x272108[_0x501891(0x2a9)]+_0x501891(0x4e4),_0x59ca15[_0x501891(0x56c)]=()=>{const _0x1a5658=_0x501891;if(selectedCats[_0x1a5658(0x478)](_0x2e41db))selectedCats=selectedCats[_0x1a5658(0x49b)](_0x32343d=>_0x32343d!==_0x2e41db),_0x59ca15[_0x1a5658(0x214)][_0x1a5658(0x285)](_0x1a5658(0x223));else selectedCats[_0x1a5658(0x41f)]<0x6&&(selectedCats['push'](_0x2e41db),_0x59ca15[_0x1a5658(0x214)]['add'](_0x1a5658(0x223)));let _0x460cb4=window['isOnlineMode']?0x1:0x4;document[_0x1a5658(0x58c)]('toPlayersBtn')[_0x1a5658(0x52a)]=selectedCats[_0x1a5658(0x41f)]<_0x460cb4,document[_0x1a5658(0x58c)](_0x1a5658(0x464))[_0x1a5658(0x24b)][_0x1a5658(0x33a)]=selectedCats[_0x1a5658(0x41f)]>=_0x460cb4?_0x1a5658(0x32f):_0x1a5658(0x22c),document[_0x1a5658(0x58c)](_0x1a5658(0x481))[_0x1a5658(0x3d5)]=selectedCats['length']+'/6';},_0x50b1a2['appendChild'](_0x59ca15);});}document['getElementById']('toPlayersBtn')[_0x3d9cbe(0x56c)]=()=>{const _0x2a8b3b=_0x3d9cbe;document[_0x2a8b3b(0x58c)](_0x2a8b3b(0x36c))[_0x2a8b3b(0x24b)][_0x2a8b3b(0x218)]=_0x2a8b3b(0x1db),document['getElementById'](_0x2a8b3b(0x5cd))['style']['display']=_0x2a8b3b(0x509),players=[],updatePList();},document[_0x3d9cbe(0x58c)]('addPBtn')[_0x3d9cbe(0x56c)]=()=>{const _0x3b7a6f=_0x3d9cbe,_0xfe84e3=document[_0x3b7a6f(0x58c)](_0x3b7a6f(0x3b1))[_0x3b7a6f(0x443)];_0xfe84e3&&(players[_0x3b7a6f(0x1d8)](_0xfe84e3),document[_0x3b7a6f(0x58c)]('playerName')[_0x3b7a6f(0x443)]='',updatePList());};function updatePList(){const _0x14c36e=_0x3d9cbe;document[_0x14c36e(0x58c)](_0x14c36e(0x2e2))[_0x14c36e(0x331)]=players[_0x14c36e(0x24f)](_0x48b463=>'<div>'+_0x48b463+_0x14c36e(0x4e4))[_0x14c36e(0x2cf)]('');}document[_0x3d9cbe(0x58c)]('goPlayBtn')[_0x3d9cbe(0x56c)]=()=>{const _0x13a4ea=_0x3d9cbe;if(players[_0x13a4ea(0x41f)]<0x1)return;prepareGame(),document[_0x13a4ea(0x58c)](_0x13a4ea(0x5cd))['style'][_0x13a4ea(0x218)]=_0x13a4ea(0x1db),document[_0x13a4ea(0x58c)]('readyScreen')[_0x13a4ea(0x24b)][_0x13a4ea(0x218)]='flex';},document['getElementById'](_0x3d9cbe(0x25b))[_0x3d9cbe(0x56c)]=()=>{const _0xb12fae=_0x3d9cbe;if(players[_0xb12fae(0x41f)]<0x1)return;prepareGame(),document[_0xb12fae(0x58c)](_0xb12fae(0x5cd))[_0xb12fae(0x24b)][_0xb12fae(0x218)]=_0xb12fae(0x1db),document[_0xb12fae(0x58c)](_0xb12fae(0x358))[_0xb12fae(0x24b)][_0xb12fae(0x218)]=_0xb12fae(0x509);},document[_0x3d9cbe(0x58c)](_0x3d9cbe(0x280))['onclick']=()=>{const _0x43fd4c=_0x3d9cbe;document[_0x43fd4c(0x58c)](_0x43fd4c(0x470))['style']['display']='none';let _0xb627a2=document[_0x43fd4c(0x58c)](_0x43fd4c(0x255));if(currentTheme===_0x43fd4c(0x4c5))_0xb627a2[_0x43fd4c(0x24b)][_0x43fd4c(0x304)]=_0x43fd4c(0x2b7),_0xb627a2['style'][_0x43fd4c(0x5cb)]=_0x43fd4c(0x2db),_0xb627a2[_0x43fd4c(0x24b)][_0x43fd4c(0x20e)]=_0x43fd4c(0x4f1);else currentTheme==='gathering'?(_0xb627a2['style'][_0x43fd4c(0x304)]=_0x43fd4c(0x326),_0xb627a2[_0x43fd4c(0x24b)][_0x43fd4c(0x5cb)]='cover',_0xb627a2[_0x43fd4c(0x24b)]['backgroundPosition']=_0x43fd4c(0x4f1)):(_0xb627a2[_0x43fd4c(0x24b)]['backgroundImage']=_0x43fd4c(0x1db),_0xb627a2['style'][_0x43fd4c(0x33a)]='#B8860B');_0xb627a2['style'][_0x43fd4c(0x218)]=_0x43fd4c(0x509),loadCard();};function updateBackgroundImage(){const _0x5a78b1=_0x3d9cbe;let _0xad7060=document[_0x5a78b1(0x58c)](_0x5a78b1(0x2f4));if(_0xad7060[_0x5a78b1(0x24b)][_0x5a78b1(0x218)]===_0x5a78b1(0x1db))return;let _0x8eb46=window[_0x5a78b1(0x3d7)]>window[_0x5a78b1(0x3ec)];if(currentTheme===_0x5a78b1(0x4c5))_0xad7060['style'][_0x5a78b1(0x304)]=_0x8eb46?_0x5a78b1(0x497):'url(\x27eid-h.png\x27)';else currentTheme===_0x5a78b1(0x44a)&&(_0xad7060['style']['backgroundImage']=_0x8eb46?_0x5a78b1(0x476):_0x5a78b1(0x345));}window[_0x3d9cbe(0x2ae)](_0x3d9cbe(0x5a3),updateBackgroundImage);function goToPhotoScreen(){const _0x388164=_0x3d9cbe;let _0x38a48a=document['getElementById'](_0x388164(0x3b9))[_0x388164(0x443)];currentTheme=document['getElementById'](_0x388164(0x38d))['value'];if(!_0x38a48a)_0x38a48a='\x20';document[_0x388164(0x58c)](_0x388164(0x358))[_0x388164(0x24b)]['display']=_0x388164(0x1db);let _0x12d135=document[_0x388164(0x58c)](_0x388164(0x2f4)),_0x165fc1=document[_0x388164(0x58c)](_0x388164(0x3c0));if(currentTheme===_0x388164(0x4c5))_0x165fc1[_0x388164(0x3d5)]=_0x38a48a,_0x165fc1[_0x388164(0x24b)][_0x388164(0x2bb)]='#3D3D03',_0x12d135[_0x388164(0x24b)]['display']=_0x388164(0x509),updateBackgroundImage();else currentTheme===_0x388164(0x44a)?(_0x165fc1[_0x388164(0x3d5)]=_0x38a48a,_0x165fc1[_0x388164(0x24b)][_0x388164(0x2bb)]=_0x388164(0x315),_0x12d135['style'][_0x388164(0x218)]='flex',updateBackgroundImage()):document[_0x388164(0x58c)](_0x388164(0x470))[_0x388164(0x24b)][_0x388164(0x218)]=_0x388164(0x509);}function continueToGame(){const _0x3ed4eb=_0x3d9cbe;document[_0x3ed4eb(0x58c)](_0x3ed4eb(0x2f4))[_0x3ed4eb(0x24b)][_0x3ed4eb(0x218)]=_0x3ed4eb(0x1db),document[_0x3ed4eb(0x58c)](_0x3ed4eb(0x470))[_0x3ed4eb(0x24b)]['display']=_0x3ed4eb(0x509);}function prepareGame(){const _0x3cc559=_0x3d9cbe;gameSession['words']=[],gameSession['score']={},players['forEach'](_0x10e9f4=>gameSession[_0x3cc559(0x3f0)][_0x10e9f4]=0x0);const _0x32e506=appState[_0x3cc559(0x1cc)]?0xa:0x3;selectedCats[_0x3cc559(0x4b1)](_0xde6b7d=>{const _0x1d9037=_0x3cc559;let _0x2d34c1=FULL_DATA[_0xde6b7d][_0x1d9037(0x36e)],_0x34950b=usedWords[_0xde6b7d]||[],_0x4c73bc=_0x2d34c1['filter'](_0x4e7acd=>!_0x34950b[_0x1d9037(0x478)](_0x4e7acd['c']));_0x4c73bc['length']<_0x32e506&&(_0x34950b=[],_0x4c73bc=[..._0x2d34c1],_0x4c73bc['sort'](()=>Math['random']()-0.5));const _0x3392fe=_0x4c73bc[_0x1d9037(0x347)](0x0,_0x32e506);_0x3392fe[_0x1d9037(0x4b1)](_0x599f38=>_0x34950b['push'](_0x599f38['c'])),usedWords[_0xde6b7d]=_0x34950b,_0x3392fe[_0x1d9037(0x4b1)](_0x55739a=>gameSession[_0x1d9037(0x36e)][_0x1d9037(0x1d8)]({..._0x55739a,'cat':FULL_DATA[_0xde6b7d][_0x1d9037(0x2a9)]}));}),localStorage[_0x3cc559(0x1da)](_0x3cc559(0x2c5),JSON[_0x3cc559(0x3fa)](usedWords)),gameSession[_0x3cc559(0x36e)][_0x3cc559(0x5c3)](()=>Math[_0x3cc559(0x571)]()-0.5),gameSession[_0x3cc559(0x4e0)]=0x0,document[_0x3cc559(0x58c)](_0x3cc559(0x55e))['innerHTML']=players[_0x3cc559(0x24f)](_0x23442e=>_0x3cc559(0x3bb)+_0x23442e+_0x3cc559(0x34b)+_0x23442e+_0x3cc559(0x1eb))[_0x3cc559(0x2cf)](''),updateLiveRank();}function updateLiveRank(){const _0x5e7105=_0x3d9cbe,_0x53f7d0=document['getElementById'](_0x5e7105(0x28e)),_0x2f3c0f=Object[_0x5e7105(0x563)](gameSession[_0x5e7105(0x3f0)])[_0x5e7105(0x5c3)]((_0x3397fe,_0x3fe8eb)=>_0x3fe8eb[0x1]-_0x3397fe[0x1]);_0x53f7d0[_0x5e7105(0x331)]=_0x2f3c0f[_0x5e7105(0x24f)](([_0x4ef4cf,_0x1ac57e],_0x18eef4)=>_0x5e7105(0x40d)+(_0x18eef4+0x1)+'.\x20'+_0x4ef4cf+_0x5e7105(0x24d)+_0x1ac57e+_0x5e7105(0x58f))['join']('');}function _0x55d1(){const _0x3751a1=['خروف','ب\x20ك\x20و\x20ك','كاميرا','ا\x20ل\x20ي\x20ا\x20ت\x20ر\x20أ\x20س','ع\x20ا\x20ء\x20ب\x20ة','منى\x20زكي','ن\x20م\x20ا\x20ي','دمشق','فراولة','ا\x20ب\x20ي\x20ت\x20ز','قفازات','بطاطس','ر\x20ت\x20و\x20ت\x20ي','قفز','صورة','مزارع','ن\x20و\x20ا\x20ن\x20ي\x20ل','دولاب','ت\x20ر\x20م\x20ح\x20ا\x20ا','أرنب','خ\x20ب\x20ط\x20ي','ن\x20ب\x20ع','disabled','cat','ر\x20ن\x20ه','قصي\x20خولي','11963AfYfjf','ح\x20س\x20ا\x20ب\x20م','العهد','سعادة','خجل','ر\x20ف\x20أ','ة\x20ا\x20م\x20ب\x20ج','ر\x20ن\x20ا\x20ج\x20ن','حقيبة','ة\x20ر\x20ق\x20ب','ق\x20د\x20ر\x20ل\x20م\x20ح\x20ت\x20و\x20م\x20ا','م\x20ا\x20ك\x20ة\x20ل\x20م','أستراليا','ن\x20ل\x20ش\x20ا\x20ي','و\x20ا\x20ي\x20ت\x20ك\x20ل','ي\x20ك\x20ن\x20ا','بطريق','جوال','هاتف','تجربة','ا\x20ه\x20ب\x20أ','د\x20ن\x20ع','ر\x20ط\x20ق','احتفال','كوكب','الهيبة','س\x20ا\x20ب\x20ك','onlineInputArea','ب\x20ح\x20س\x20ي','ض\x20ح\x20ك\x20ي','ق\x20ر\x20ط\x20ي\x20ب','باريس','حنان','لن\x20أعيش\x20في\x20جلباب\x20أبي','م\x20ا\x20ل\x20ك\x20ر\x20ا\x20م\x20ي','روما','ي\x20د\x20ن\x20ي\x20س','محاسب','سابك','ك\x20ض\x20ر','غابة','فروسية','ة\x20و\x20ر\x20ا\x20ب\x20ك','س\x20و\x20ي\x20ق\x20ت','ض\x20ا\x20ع\x20ل\x20ا\x20س\x20ي\x20ن\x20و\x20ا\x20ت','الاجتياح','ر\x20ة\x20إ\x20ب','مهندس','scoreButtons','ة\x20ل\x20س\x20ط','تسديد','scrambledText','طمأنينة','entries','م\x20ا\x20د\x20م\x20ا\x20ل','ليوناردو\x20دي\x20كابريو','يستريح','سائق','البرتغال','قرد','كوب','م\x20ا\x20ج\x20د\x20م\x20ه\x20س\x20ن\x20د\x20ل\x20ا','onclick','ي\x20ح\x20ا\x20ر\x20ت\x20ا','ليبيا','آ\x20ة\x20م\x20ر\x20ا','ب\x20ا\x20م\x20س\x20ا\x20ق\x20ل\x20ب\x20و\x20ا','random','لويس\x20فيتون','جميل\x20وهناء','ديك','ك\x20م\x20ة\x20س','سيرين\x20عبد\x20النور','فلفل','max','ب\x20ا\x20ك\x20ت','س\x20ر\x20د\x20ة\x20م','910914TzQpEA','ن\x20س\x20ت\x20ا\x20ف','عادل\x20إمام','م\x20ل\x20ج','ن\x20م\x20ا\x20ر','كتاب','ج\x20ت\x20م\x20ا\x20ع\x20ا','ف\x20ش\x20ت\x20س\x20ى\x20م','ن\x20ص\x20د\x20و\x20ق','قلادة','بوابة','نجم','ي\x20ح\x20ا\x20ل\x20م\x20ل\x20ي\x20ة\x20ي\x20ل\x20ا','<div\x20style=\x22font-size:30px\x22>','ل\x20ك\x20س\x20ف\x20ن\x20ت\x20ي\x20إ','ف\x20ح\x20ص\x20ي','ظ\x20ح\x20ف\x20م\x20ة','getElementById','ملعب','و\x20م\x20ن\x20ي\x20ل','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20','طبيب','م\x20ع\x20س\x20ت\x20ي','ب\x20ص\x20ح\x20ا\x20م','يستيقظ','ر\x20و\x20ي\x20س\x20ة\x20ف','activationModal','خالتي\x20قماشة','ليونيل\x20ميسي','ط\x20ف\x20ع\x20م','كهربائي','ز\x20ك\x20ي\x20م\x20ن\x20ى','يكتب','أرامكو','و\x20ز\x20م','مزرعة','باستا','ص\x20د\x20ا\x20ق\x20ة','إنستجرام','شبكة','resize','ممالك\x20النار','ر\x20خ\x20ص\x20ة','تويتر','ق\x20ر\x20أ\x20ي','ج\x20ب\x20س\x20ا\x20ن','ح\x20ا\x20ب\x20س','ليالي\x20الحلمية','د\x20ي\x20م\x20ر','باروكة','المنامة','ر\x20ط\x20م','ي\x20ر\x20ج\x20ر','سجادة','homeScreen','آ\x20ر\x20م\x20ا\x20ة','أخبار','س\x20ب\x20ح\x20ي','onload','ع\x20د\x20ا\x20س\x20ة','عصفور','بحر','أ\x20س\x20ك','ض\x20م\x20ر\x20م','</b>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','ج\x20و\x20ر\x20ب\x20ت\x20س\x20ل\x20ي\x20ا\x20و','ب\x20ا\x20ط\x20ح\x20إ','م\x20ر\x20ا\x20و','ك\x20و\x20ط\x20ي\x20و','ص\x20b\x20ح\x20ا\x20م','ل\x20ة\x20ا\x20د\x20ي\x20ي\x20م','ن\x20ر\x20ا\x20ل\x20ك\x20ا\x20م\x20ا\x20م\x20ل','sort','ح\x20س\x20ن\x20ي\x20ت\x20ا\x20م\x20ر','جمل','أ\x20س\x20ي','ل\x20ج\x20ث','م\x20س\x20ح\x20ا\x20ت','سيدني','ن\x20ت\x20ا\x20ف\x20س','backgroundSize','م\x20ن\x20ج','playersScreen','س\x20ا\x20ل\x20ة\x20غ','م\x20ا\x20ر\x20ع\x20ي\x20ل\x20ا','ج\x20م\x20ع\x20ي','ق\x20ف\x20أ','ر\x20و\x20ب\x20ج','طلاء','ساعة','يتعلم','فيل','ا\x20ر\x20م\x20ك\x20ي','سلام','د\x20ت\x20ي\x20د\x20س','كرة\x20سلة','صنعاء','إيطاليا','ج\x20ع\x20ا\x20ب\x20إ','حوت','شارع','و\x20ك\x20ة\x20ش','أحمد\x20حلمي','ر\x20ن\x20م\x20ا\x20ة','ي\x20ة\x20ن\x20د\x20ب\x20ل\x20ي\x20ة\x20ا\x20ق','سباك','كاتب','م\x20ظ\x20ا\x20ن','مفرش','ة\x20إ\x20ص\x20ب\x20ا','يا\x20خوي','ز\x20ا\x20ت\x20ق\x20ف\x20ا','isPremium','ا\x20ي\x20إ\x20ك\x20ا','يغلق','ي\x20د\x20ة\x20ر\x20ك','س\x20ط\x20م\x20ق','بطة','و\x20ي\x20ي\x20ا\x20خ','ماك','ن\x20ا\x20ن\x20ف','6632DLRGli','مطر','عسل','push','ل\x20ا\x20ش\x20ل','setItem','none','سكين','تنس','طبيعة','س\x20ر\x20ج','ح\x20ج\x20ر\x20ا','فنان','س\x20ش\x20م','ب\x20ي\x20ط\x20ب','ل\x20ق\x20ق','createElement','resultsScreen','م\x20ا\x20ل\x20ك\x20ز\x20ي\x20ن','سلطة','ف\x20و\x20ر\x20ك\x20ي\x20ن\x20م\x20و','فأر','</button>','صداقة','ج\x20ة\x20ل\x20ا\x20ث','ض\x20ة\x20ر\x20ي\x20ا','ط\x20ف\x20ة\x20ع\x20ا','ضفدع','خفاش','برياني','ن\x20م\x20ع\x20ا','ن\x20ب\x20م\x20ه','هدف','هيثم\x20شاكر','م\x20و\x20ث','موز','ة\x20ب\x20م\x20و','جريدة','جزيرة','block','مشاعر','ط\x20ا\x20ي\x20ر\x20ا\x20ن\x20ي\x20ب','قلق','ذ\x20ي\x20ع\x20م','سباح','ر\x20ق\x20ا\x20ن\x20ي','مذيع','قانون','ت\x20ر\x20ف\x20د','سويسرا','ل\x20م\x20أ','ratbni_premium','ح\x20ي\x20ر\x20ة\x20ب','theCard','بيروت','تضامن','ا\x20ل\x20د\x20و\x20ب','backgroundPosition','ز\x20ت\x20ف\x20ا\x20ل','ا\x20ذ\x20ح\x20ء','ي\x20ط\x20ا\x20إ\x20ل\x20ا\x20ا','تمر','ا\x20ل\x20د\x20و\x20b','classList','القدس','black','س\x20ي\x20د\x20س\x20م\x20ر','display','يقفز','كندا','د\x20ق\x20ة\x20ص\x20ا','كاظم\x20الساهر','جندي','مصر','ع\x20م\x20و\x20ش\x20ر','توتر','كوريا','قمر','selected','د\x20د\x20ا\x20ح','طاولة','ة\x20م\x20م\x20ا\x20ح','جمهور','ر\x20ص\x20ق','غ\x20ن\x20ي\x20ي','يقود','هدوء','#ccc','د\x20و','عقرب','و\x20ر\x20ة\x20ص','أفعال','ن\x20ص\x20ا\x20ر\x20د\x20إ\x20ي\x20ا','official','الضوء\x20الشارد','س\x20م\x20ة\x20ع\x20ا','f\x20ش\x20ر\x20م','نافورة','toUpperCase','تلفاز','الهند','ك\x20ن\x20س\x20م\x20ة','و\x20ت\x20ي\x20ب\x20ر','إياد\x20نصار','ط\x20ر\x20م\x20ب','د\x20خ\x20م\x20ة','الشارقة','غ\x20ل\x20ق\x20ي','الباحة','toggle','د\x20ق\x20ة\x20ي\x20ق','حكم','ت\x20ر\x20م\x20ج\x20م','مرسيدس','timeLeft','ع\x20ا\x20ر\x20ش\x20م','المراعي','flipped','style','غ\x20ر\x20ب\x20ت\x20ا\x20ا\x20س','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-weight:bold;\x20color:#059669\x22>','هجوم','map','قبعة','إندونيسيا','د\x20ر\x20ي\x20ق\x20ت','ر\x20ك\x20ة\x20ف','ب\x20ذ\x20ئ\x20ا\x20ا\x20ل\x20ل\x20ج\x20b','gameScreen','أدوات','ملل','category-card','فيديو','مفتاح\x20كهرباء','goPlayBtn','يطرح','شورت','ع\x20م\x20ر\x20و\x20د\x20ي\x20ا\x20ب','يأس','ثلج','بطانية','س\x20ك\x20و\x20ف\x20ب\x20ي','ق\x20ث\x20ة','د\x20ي\x20م\x20ن','عتيج\x20الصوف','س\x20ة\x20ع\x20ا\x20م\x20س\x20أ\x20ر','ن\x20ن\x20ل\x20د','ج\x20د\x20ا\x20ج','ت\x20ر\x20م\x20ي\x20م','شمال','ب\x20ت\x20ا\x20ا\x20س','ت\x20م\x20خ\x20ا','و\x20ك\x20ب','إسبانيا','ربطة\x20عنق','ر\x20و\x20ن\x20ا\x20ي\x20ج\x20ل','خيار','ق\x20ل\x20ا\x20ح','فرنسا','true','ج\x20ه\x20ز\x20ي','add','أبها','الرحلة','ي\x20ن\x20ة\x20ز','م\x20ل\x20ش\x20ا','يفتح','ر\x20و\x20ل\x20ف\x20ة\x20ا\x20ا','ب\x20ة\x20آ\x20ك','بريطانيا','حلاق','realStartBtn','كابتن','رياضة','مسطرة','hidden','remove','ر\x20n\x20f','ب\x20ا\x20ح\x20س','ق\x20ص\x20ب\x20ي\x20ن\x20ا\x20ص\x20ر\x20ا\x20ل','اشتياق','1924rssIJK','فكرة','ش\x20ق\x20ا\x20م','لياقة\x20بدنية','liveRankList','يشاهد','غطس','س\x20د\x20م\x20ج','غزال','</span><b>','ح\x20ب','تكنولوجيا','معطف','ب\x20و\x20ك\x20ت','بطارية','ز\x20و\x20م\x20ت\x20ر\x20و\x20ك','مدفأة','يخلع','بحيرة','ركض','الأرجنتين','ي\x20ل\x20ص\x20د\x20ي','قطر','ق\x20ز\x20ل\x20ب\x20ا\x20ل\x20ر\x20د','و\x20ي\x20ا\x20ل\x20و\x20ج\x20ن\x20ك\x20ت\x20ا','ز\x20f\x20ل\x20ت\x20ا','س\x20ا\x20ر\x20م','ع\x20ق\x20ر','ف\x20ع\x20ا\x20د','ل\x20و\x20س\x20ف','ع\x20س\x20ا\x20ة','name','#059669','b\x20ن\x20ك','ينام','إبريق','addEventListener','نقطة','ممثل','ع\x20س\x20ا\x20د\x20ة','ص\x20و\x20ر\x20ي','شفقة','ا\x20د\x20و\x20ي','ر\x20ا\x20ص\x20ع\x20ة\x20م','gameCatBadge','url(\x27eid-game.png\x27)','ملاكمة','جمباز','freeGamesInfo','color','الخرطوم','وظائف','إحباط','بيتزا','ج\x20ه\x20ة\x20ب','بصل','موظف','شاشة','تعاطف','ratbni_used_words','ت\x20م\x20ف\x20ح','match','اليابان','أبل','اجتماع','كرة\x20يد','ل\x20ة\x20ع\x20ا\x20ئ','أبو\x20الملايين','زارا','join','ن\x20ا\x20ز\x20خ\x20ة','مرطب','و\x20ك\x20ف\x20ف','🎉\x20استمتع\x20باللعب\x20بلا\x20حدود!','ل\x20س\x20أ\x20ي','مشاهير','ق\x20ب\x20ل\x20م\x20ت\x20س','ح\x20ي\x20ض\x20ت\x20ة','ك\x20ا\x20ظ\x20م\x20ر\x20ه\x20س\x20ل\x20ا','بلجيكا','الحيالة','cover','إطفائي','عمان','و\x20ي\x20ر\x20ا\x20س','ش\x20ح\x20ا\x20و','ثقة','فندق','pList','م\x20ك\x20و\x20أ\x20ر\x20ا','ح\x20ل\x20ق','م\x20ع\x20د\x20ا\x20ن\x20ش','ك\x20ي\x20ت\x20ر\x20ا','ع\x20ل\x20م\x20ش\x20و\x20ن\x20ا\x20ل\x20ع\x20ق\x20م','ع\x20ل\x20ة\x20ق','د\x20ب\x20غ\x20د\x20ا','بنطلون','منزل\x20السعادة','يبيع','س\x20ت\x20ي\x20ر\x20ي\x20ح','div','ط\x20ف\x20ا\x20ء\x20ي\x20إ','و\x20ح\x20ي\x20د\x20ة\x20ا\x20ل\x20ي\x20ا\x20ج\x20ن\x20ة','ثعلب','ر\x20ي\x20ر\x20س','ق\x20د\x20ح\x20ي\x20ة','photoScreen','النرويج','ض\x20ع\x20د\x20ف','ج\x20د\x20ة\x20ا\x20س','ن\x20ض\x20ت\x20م\x20ا','نظام','محفظة','ح\x20ج\x20ن\x20ا','ل\x20ا\x20د\x20م\x20ع\x20إ\x20ا\x20م','عالم','مستشار','ب\x20ك\x20س\x20ا','راحة','ثلاجة','🏙️','خمسة\x20ونص','backgroundImage','يستمع','و\x20ف\x20خ','ل\x20ي\x20س\x20ة\x20ح','مشروع','ش\x20ا\x20ك\x20ر\x20ث\x20ي\x20م\x20ه','statusBadge','الكويت','ر\x20و\x20ح\x20م\x20ة','كلب','س\x20ة\x20ل\x20ة\x20ر\x20ك','8785482CxYvWi','ر\x20ق\x20ة\x20ش\x20ل\x20ا\x20ا','ج\x20م\x20و\x20ر\x20ه','ع\x20ب\x20ا\x20ة\x20ط','رسام','د\x20ك\x20ة\x20ر\x20م','#929063','RT-','مستقبل','شاي','ي\x20ب\x20ة\x20ل\x20ا\x20ه','ح\x20ن\x20ص','س\x20د\x20أ','مخدة','خ\x20ط\x20ا\x20ي','</div><div>','ر\x20ة\x20ح\x20ل\x20ا\x20ف','ط\x20خ\x20أ','د\x20و\x20ق\x20ي','العشق\x20الممنوع','ح\x20ف\x20ا\x20ت\x20ل\x20ا\x20ل','أساور','س\x20ب\x20ي\x20ب\x20ي','url(\x27gathering-game.png\x27)','ر\x20ت\x20ش\x20و','ا\x20ن\x20د\x20ل\x20ه','ع\x20ل\x20م\x20ت\x20ي','م\x20ل\x20ث\x20م','برلين','مدرسة\x20المشاغبين','رسالة','ز\x20ن\x20ح','#00008B','س\x20ر\x20ن','innerHTML','startsWith','ل\x20ب\x20س\x20ي','ب\x20س\x20ة\x20م','ل\x20ب\x20ع\x20ث','و\x20ح\x20ت','كرسي','ش\x20ا\x20ر\x20د\x20ء\x20و\x20ض\x20ل\x20ا\x20ا\x20ل','س\x20ك\x20و\x20م\x20و','background','نظارة','مطار','إيكيا','تزلج','ستارة','ب\x20ا\x20ي\x20ن\x20س\x20إ\x20ا','ن\x20ز\x20ل\x20ا\x20ل\x20س\x20ع\x20ا\x20د\x20ة\x20م','ب\x20ي\x20ح\x20ق\x20ة','3578535GyDXUn','صندوق','url(\x27gathering-h.png\x27)','د\x20f\x20ة\x20أ\x20م','slice','لحم','الحفرة','ناصر\x20القصبي','\x27,\x20this)\x22\x20style=\x22padding:10px;\x20border:2px\x20solid\x20#00008B;\x20border-radius:5px;\x20background:white;\x20font-weight:bold;\x22>','ن\x20ن\x20ا\x20ح','معلومات','صحفي','نعناع','ر\x20ي\x20ة\x20م\x20ا','أ\x20ب\x20ا\x20ر\x20خ','ة\x20ج\x20ت\x20ب\x20ر','timerDisplay','وسادة','إعجاب','حلق','و\x20ا\x20ي\x20ه\x20و','themeScreen','ح\x20ف\x20ا\x20ت','سرير','ع\x20س\x20ة\x20ا','ر\x20ا\x20ة\x20ظ\x20ن','مدرب','ي\x20ل\x20ف','ر\x20ا\x20ظ\x20ة\x20ن','نيكول\x20كيدمان','ر\x20غ\x20ب\x20ا\x20م\x20ل','منبه','icon','ح\x20م\x20ف\x20ت\x20ا\x20ء\x20ر\x20ه\x20ك\x20ب\x20ا','غضب','موقد','س\x20د\x20م\x20ن\x20ه','ذئب','إبرة','ب\x20ة\x20ح\x20ي\x20ق','ماعز','categoriesScreen','ر\x20ط\x20ح\x20ي','words','أصالة','يركض','الإسكندرية','صحراء','منارة','حجاب','مذكرة','ي\x20ب\x20ا\x20ر\x20ء\x20ه\x20ك','عطر','splashScreen','م\x20ق\x20ل','يلبس','استغراب','و\x20ل\x20ط\x20ة\x20ا','يجهز','ا\x20خ\x20و\x20ة\x20ل\x20ا','و\x20س\x20ا\x20ب\x20ح','شمعة','يسبح','مندي','س\x20و\x20ت\x20ن','nextCardBtn','رمان','جرجير','الطائف','سامسونج','ك\x20ف\x20و\x20ر\x20ي\x20و\x20ا\x20ئ\x20ل','ثعبان','1665378MXFlEb','ر\x20ا\x20ق\x20ر','themeSelect','ي\x20ا\x20ر\x20س\x20ة\x20ا','ش\x20ا\x20ش\x20ة','د\x20س\x20ر\x20ة\x20ل\x20ا\x20م\x20ش\x20غ\x20ب\x20ي\x20ن\x20ا','تفاح','ح\x20ة\x20ل\x20ا\x20ا\x20ب','رامي\x20مالك','تسلل','فرن','س\x20ر\x20ي\x20ك','س\x20غ\x20ا\x20ل\x20ة','صقر','مترجم','و\x20ة\x20ش\x20ك','ر\x20و\x20ط\x20ا\x20خ\x20م\x20ل','بريد','و\x20ل\x20ن\x20ط\x20ب\x20ن','كفوف','ح\x20ل\x20م\x20ي\x20د\x20أ\x20ح\x20م','ر\x20ب\x20ا\x20ل\x20خ','البرنس','المغرب','ح\x20م\x20ك','ب\x20ل\x20أ','م\x20ا\x20ء\x20س','سماعة','ح\x20ا\x20ر\x20ب','ع\x20ط\x20ا\x20ف\x20ت','ن\x20ل\x20د\x20ن\x20ف','ن\x20ي\x20ف','ثوم','ط\x20ا\x20ر\x20ة\x20ئ\x20ة\x20ر\x20ك','مستشفى','جورج\x20كلوني','getItem','ياسمين\x20صبري','playerName','الدمام','س\x20ي\x20ل\x20و\x20ن\x20م\x20ي\x20ي','trim','ا\x20ي\x20ح\x20ل\x20ة\x20ل\x20ا','و\x20ح\x20د\x20ة\x20ل\x20ا','بغداد','ر\x20غ\x20ط\x20ل\x20ر\x20ق\x20ا\x20ة\x20م\x20ي\x20أ','familyNameInput','ج\x20ت\x20ز\x20ل','<button\x20onclick=\x22addScore(\x27','ي\x20ط\x20ق\x20ر\x20ا\x20د\x20م\x20ة\x20ي','خوف','و\x20ر\x20ت\x20ت','ن\x20ع\x20ا\x20ء\x20ص','printed-family-name','نجران','دقيقة','gamesCount','يسأل','جدة','categoriesGrid','ب\x20ع\x20ا\x20ل','الدنمارك','ف\x20ر\x20ص\x20ة\x20ا','مروحة','خ\x20ل\x20ع\x20ي','الجزائر','نايكي','شلال','ر\x20ا\x20ك\x20د\x20ن\x20م\x20ا\x20ل','ملعقة','مرآة','ف\x20ش\x20ك\x20س\x20ت\x20ي','ح\x20م\x20ل','جرير','innerText','خياط','innerHeight','ج\x20ا\x20ن\x20ه\x20ل\x20ر\x20أ\x20ت\x20ف\x20ا','م\x20ح\x20ز\x20ا','ز\x20م\x20ع\x20ا','ي\x20ا\x20ن\x20م\x20أ\x20ل\x20ا','ي\x20م\x20ة\x20غ','مكنسة','س\x20ا\x20ه\x20ر\x20ل\x20ل\x20ي\x20ل\x20ا','درب\x20الزلق','ن\x20و\x20ي\x20س\x20ت\x20و\x20ل\x20ف','ه\x20ي\x20ة\x20ر\x20ا\x20ك\x20ا','خاتم','مكرونة','ل\x20ي\x20ة\x20ا\x20ق','<span\x20style=\x22color:red;\x20font-weight:bold;\x22>انتهت\x20الجولة\x20المجانية</span>','ر\x20ك\x20ض\x20ي','حزن','ميكروفون','ارتياح','يأكل','ي\x20ض\x20ب','innerWidth','ب\x20د','بيض','ك\x20ي\x20د','score','قرش','س\x20ك\x20ب\x20ة','حيوانات','الصين','العثيم','م\x20ط\x20م\x20ا\x20ط','حليب','ج\x20ة\x20ل\x20ث\x20ا','عباءة','stringify','د\x20س\x20ن\x20ه\x20م\x20ا\x20ر\x20م\x20ع\x20ي\x20ا\x20م','عمل','رأفت\x20الهجان','و\x20ج\x20ل\x20ج','#FFD700','صفارة','ويل\x20سميث','ديمقراطية','6215aXCkLA','وادي\x20الذئاب','مفتاح','ز\x20ر\x20أ','يرقص','تبوك','ك\x20ن\x20ر\x20ا\x20ب','activationError','ا\x20ط\x20ش\x20ط\x20ا\x20م\x20ش','عدن','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rank-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>','ب\x20ج\x20ل\x20أ\x20ع\x20ل\x20ي\x20ش\x20ي\x20ن\x20ا\x20ب\x20ف\x20ب','نانسي\x20عجرم','ئ\x20ز\x20ا\x20ج\x20ر\x20ل\x20ا','موسكو','مانجو','نيويورك','ن\x20ا\x20ع\x20ب\x20ث','تركيا','ر\x20ح\x20ب','جوليا\x20روبرتس','ماكدونالدز','بيبسي','شاحن','ي\x20ع\x20ي\x20ب','ل\x20إ\x20ق\x20ل\x20ب\x20و\x20ل\x20ا\x20ي\x20ج\x20ر\x20ل','ب\x20ق\x20ا\x20س','بسمة','length','ا\x20ل\x20ز\x20غ','ي\x20ب\x20ظ\x20و\x20أ\x20ب\x20و','احترام','ل\x20ع\x20ق\x20ة\x20م','سوريا','تويوتا','ط\x20ا\x20س\x20ب\x20ط\x20ا','خ\x20و\x20ل\x20ي\x20ق\x20ص\x20ي','ألمانيا','دفتر','و\x20م\x20ر\x20ت\x20ي','ص\x20ي\x20ر\x20ع','لبنان','ترميم','وائل\x20كفوري','صندل','خ\x20ن\x20م\x20س\x20ج\x20و\x20م','العاصوف','تم\x20تفعيل\x20النسخة\x20الكاملة\x20بنجاح!\x20🥳','يجري','م\x20ك\x20س','ببغاء','وشاح','فلوس','ص\x20ل\x20ب','مصارعة','جسر','ماركات','طباخ','بهجة','د\x20ي\x20و\x20ف\x20ي','isOnlineMode','س\x20و\x20ا\x20ر\x20أ','ح\x20ة\x20ر\x20ا','دبي','value','و\x20ل\x20ا\x20ك\x20ا\x20و\x20ك\x20ك\x20ا','ع\x20ل\x20م\x20q\x20ة','ر\x20ط\x20م\x20ا','سحلية','بحار','تقدير','gathering','isHost','م\x20ر\x20ق','أنجلينا\x20جولي','ع\x20ن\x20ا\x20ع\x20ن','ن\x20د\x20م\x20ي\x20ة\x20ل\x20ا','يضحك','ح\x20ي\x20ا\x20ت\x20ج\x20ا\x20ل\x20ا\x20ح','د\x20ا\x20ن\x20ر\x20ل\x20أ','ه\x20ف\x20ك','ص\x20م\x20ق','ا\x20ر\x20ز\x20ا','ف\x20ر\x20س\x20ا\x20ي','خطأ','ر\x20ا\x20م\x20ج\x20ت\x20ن\x20س\x20إ','ت\x20غ\x20ا\x20ل\x20ر\x20ب\x20ل\x20ا','ط\x20ا\x20ن\x20ي\x20ة\x20b','b\x20ا\x20س\x20ح\x20ة','ب\x20ئ\x20ذ','ط\x20س\x20غ','وادي','قاضي','حديقة','نهر','قيامة\x20أرطغرل','سباحة','toPlayersBtn','قلب','غسالة','فني','ر\x20و\x20ي\x20ن\x20ك\x20و\x20ي','و\x20ه\x20ة\x20ق','نملة','السويد','شرطي','معلم','د\x20س\x20ق\x20ل\x20ا','ن\x20ق\x20ف\x20د','readyScreen','ش\x20د\x20ا\x20ي\x20ه','سماء','يحمل','ط\x20ب\x20ل\x20ر\x20ا\x20س','startBtn','url(\x27gathering-v.png\x27)','ص\x20ح\x20ف\x20ة\x20ي','includes','ر\x20ى\x20ح\x20ل\x20ا','أ\x20ك\x20ل\x20ي','ص\x20و\x20ف\x20ا\x20ل\x20ع\x20و','د\x20ي\x20ر\x20ب','ة\x20ا\x20ب\x20و\x20و\x20ب','ض\x20ي\x20ا\x20ر\x20ل\x20ا','القدر\x20المحتوم','سوني','catInstruction','يدرس','إيقاف','timer','غ\x20ب\x20ة\x20ا','gamesPlayed','س\x20و\x20ي\x20ن\x20إ\x20ا\x20ن\x20د','خ\x20س','م\x20ل\x20ح\x20ي','ي\x20ة\x20س\x20ا\x20و\x20ل\x20د\x20ع','ا\x20ي\x20ة\x20ر\x20ك\x20ن\x20د\x20س\x20إ\x20ل','فخر','م\x20ص\x20ل\x20ح\x20م\x20د\x20ا','صابون','جورب','مصباح','س\x20ر\x20ي\x20س\x20و\x20ا','يسافر','ت\x20ا\x20ك\x20ي\x20ن\x20ك','د\x20ي\x20و\x20ك\x20ا\x20ب\x20ر\x20ي\x20ل\x20ي\x20و\x20ن\x20د\x20و','ظ\x20ف\x20و\x20م','د\x20س\x20و\x20ا\x20ة','url(\x27eid-v.png\x27)','ر\x20ش\x20ط\x20ي','className','ل\x20ب\x20ك','filter','صحيفة','عنيزة','س\x20ت\x20ب\x20ي\x20م','ج\x20ا\x20ز\x20ع\x20ن\x20ا','أمين\x20مكتبة','ع\x20ل\x20م\x20ب','ر\x20ا\x20ه\x20ق\x20ة\x20ل\x20ا','حزام','ج\x20و\x20ر\x20ج\x20و\x20ك\x20ل\x20ي\x20ن','white','قطة','م\x20ن\x20ر','ص\x20ي\x20ن\x20ل\x20ا','روسيا','كهف','د\x20ه\x20ش\x20ة','ا\x20س\x20م\x20ح','د\x20ا\x20ن\x20ك','ن\x20ي\x20ل\x20م\x20ا','ش\x20خ\x20ا\x20ف','ratbni_games_count','forEach','و\x20ن\x20ر\x20ك\x20ة\x20م','لاعب','ج\x20و\x20ل\x20ن\x20ا\x20ي\x20ل\x20ي\x20ن\x20ا','ر\x20س\x20م\x20ح','بومة','أبوظبي','قلعة','استئناف','ح\x20ل\x20ي','ر\x20ا\x20ة\x20ي\x20ط','ي\x20ط\x20خ','جبل','ل\x20س\x20ع','تونس','الخبر','ر\x20و\x20ص\x20م','تامر\x20حسني','ة\x20ق\x20ط','اليمن','eid','صيدلي','gameProgress','حاسوب','ش\x20ق\x20ت\x20ي\x20ا\x20ا','مدير','ز\x20ق\x20ف','ز\x20ا\x20ن\x20ج\x20ا','زين\x20مالك','ق\x20د\x20م\x20ش','كأس','كوكا\x20كولا','غراند\x20أوتيل','قماش','قميص','isPaused','finalScores','ج\x20ا\x20ر\x20ي\x20ج\x20ر','م\x20ن\x20ص\x20و\x20خ\x20ة\x20س','ت\x20ر\x20f\x20د','محامي','ل\x20ا\x20ح\x20ئ','ل\x20ي\x20ب\x20ح','حائل','هولندا','ط\x20ا\x20ف\x20ل\x20ا\x20ئ','ي\x20ر\x20ا\x20ب\x20ط\x20ة','currentIndex','ل\x20م\x20ع\x20ب','ز\x20ي\x20ة\x20ر\x20ج','ا\x20ش\x20ي','</div>','ر\x20ب\x20ع\x20ق','الخاوة','ر\x20ا\x20ي\x20ف\x20ر','ي\x20م\x20ع\x20ث\x20ا\x20ل','ح\x20ا\x20ب\x20ج','ج\x20ي\x20ك\x20ب\x20ل\x20ا','و\x20ن\x20ي\x20س','الناجية\x20الوحيدة','مغناطيس','ف\x20ت\x20س\x20و\x20ر\x20ك\x20و\x20م\x20ا\x20ي','خزانة','450508UvUniH','center','ن\x20ا\x20م\x20م\x20ة\x20ل\x20ا','فرح','مقص','د\x20ف\x20ه','ا\x20م\x20ر\x20ش\x20و\x20ا','ح\x20ت\x20ف\x20ي','ح\x20م\x20ا\x20ي\x20م','قرع','ر\x20ر\x20ب\x20غ','أمل','س\x20د\x20ا\x20ي\x20د\x20أ','إصابة','ل\x20ا\x20ط\x20ء','حذاء','طيارة','ك\x20ي\x20د\x20م\x20ا\x20ن\x20ن\x20ي\x20و\x20ل','قلم','ن\x20ج\x20و\x20م\x20ا','ساهر\x20الليل','فستان','ا\x20ي\x20ط\x20ر','ن\x20ص\x20ح','ا\x20ر\x20س\x20ب\x20ي','flex','برتقال','ص\x20ي\x20ق\x20م','طيار','قهوة','النسخة\x20الكاملة\x20👑','عديل\x20الروح','ح\x20ن\x20ش\x20ا','الزند','يطبخ','غ\x20ا\x20ب\x20ء\x20ب\x20ب'];_0x55d1=function(){return _0x3751a1;};return _0x55d1();}function fixChars(_0x3afe7b){return _0x3afe7b;}function loadCard(){const _0x339b48=_0x3d9cbe;if(gameSession[_0x339b48(0x4e0)]>=gameSession[_0x339b48(0x36e)][_0x339b48(0x41f)]){endGame();return;}const _0x189c3a=gameSession['words'][gameSession[_0x339b48(0x4e0)]];document[_0x339b48(0x58c)](_0x339b48(0x561))[_0x339b48(0x3d5)]=_0x189c3a['s'],document[_0x339b48(0x58c)]('correctText')['innerText']=_0x189c3a['c'],document['getElementById'](_0x339b48(0x2b6))[_0x339b48(0x3d5)]=_0x189c3a[_0x339b48(0x52b)],document[_0x339b48(0x58c)](_0x339b48(0x4c7))[_0x339b48(0x3d5)]=gameSession[_0x339b48(0x4e0)]+0x1+'/'+gameSession[_0x339b48(0x36e)]['length'],document[_0x339b48(0x58c)](_0x339b48(0x20a))[_0x339b48(0x214)][_0x339b48(0x285)](_0x339b48(0x24a)),startTimer(),window[_0x339b48(0x43f)]&&(document[_0x339b48(0x58c)](_0x339b48(0x549))[_0x339b48(0x24b)][_0x339b48(0x218)]='flex',document[_0x339b48(0x58c)](_0x339b48(0x55e))[_0x339b48(0x24b)][_0x339b48(0x218)]=_0x339b48(0x1db));}function _0x12fa(_0x32e286,_0x6b25cd){_0x32e286=_0x32e286-0x1c5;const _0x55d1e9=_0x55d1();let _0x12fabb=_0x55d1e9[_0x32e286];return _0x12fabb;}document[_0x3d9cbe(0x58c)]('nextCardBtn')[_0x3d9cbe(0x56c)]=()=>{const _0x151984=_0x3d9cbe;document[_0x151984(0x58c)](_0x151984(0x20a))[_0x151984(0x214)][_0x151984(0x285)](_0x151984(0x24a)),setTimeout(()=>{const _0x472a44=_0x151984;gameSession[_0x472a44(0x4e0)]++,loadCard();},0xc8);},document[_0x3d9cbe(0x58c)](_0x3d9cbe(0x384))['onclick']=()=>{const _0x1fbfa9=_0x3d9cbe;if(window['isOnlineMode']){if(window[_0x1fbfa9(0x44b)]||isHost)window['nextOnlineWord']();return;}document[_0x1fbfa9(0x58c)](_0x1fbfa9(0x20a))[_0x1fbfa9(0x214)][_0x1fbfa9(0x285)]('flipped'),setTimeout(()=>{const _0x573fd2=_0x1fbfa9;gameSession[_0x573fd2(0x4e0)]++,loadCard();},0xc8);},document['getElementById']('theCard')[_0x3d9cbe(0x56c)]=function(){const _0x2d94af=_0x3d9cbe;if(window[_0x2d94af(0x43f)]){let _0x4cdd15=parseInt(document[_0x2d94af(0x58c)](_0x2d94af(0x353))['innerText']);if(_0x4cdd15>0x0)return;}this[_0x2d94af(0x214)][_0x2d94af(0x242)]('flipped');};function startTimer(){const _0xa80f7b=_0x3d9cbe;clearInterval(gameSession[_0xa80f7b(0x484)]),gameSession[_0xa80f7b(0x247)]=0x1e,document[_0xa80f7b(0x58c)]('timerDisplay')['innerText']=0x1e,gameSession[_0xa80f7b(0x484)]=setInterval(()=>{const _0xdd6471=_0xa80f7b;if(!gameSession[_0xdd6471(0x4d4)]){gameSession[_0xdd6471(0x247)]--,document[_0xdd6471(0x58c)](_0xdd6471(0x353))[_0xdd6471(0x3d5)]=gameSession['timeLeft'];if(gameSession[_0xdd6471(0x247)]<=0x0)clearInterval(gameSession['timer']);}},0x3e8);}window['addScore']=(_0xa5c911,_0x59b5ba)=>{const _0x2b3607=_0x3d9cbe;gameSession['score'][_0xa5c911]++,updateLiveRank(),_0x59b5ba[_0x2b3607(0x24b)][_0x2b3607(0x33a)]=_0x2b3607(0x2aa),_0x59b5ba['style']['color']=_0x2b3607(0x4a5),setTimeout(()=>{const _0x583b77=_0x2b3607;_0x59b5ba[_0x583b77(0x24b)][_0x583b77(0x33a)]=_0x583b77(0x4a5),_0x59b5ba[_0x583b77(0x24b)]['color']=_0x583b77(0x216);},0x12c);},document[_0x3d9cbe(0x58c)]('pauseBtn')[_0x3d9cbe(0x56c)]=function(){const _0x4dc211=_0x3d9cbe;gameSession[_0x4dc211(0x4d4)]=!gameSession[_0x4dc211(0x4d4)],this['innerText']=gameSession[_0x4dc211(0x4d4)]?_0x4dc211(0x4b9):_0x4dc211(0x483);};function endGame(){const _0x560e90=_0x3d9cbe;clearInterval(gameSession[_0x560e90(0x484)]),document['getElementById'](_0x560e90(0x255))['style'][_0x560e90(0x218)]=_0x560e90(0x1db),document[_0x560e90(0x58c)](_0x560e90(0x1e6))['style'][_0x560e90(0x218)]=_0x560e90(0x509);let _0x17c75b='';const _0x2ac25e=Object[_0x560e90(0x563)](gameSession['score'])[_0x560e90(0x5c3)]((_0x1458ce,_0x1c12e2)=>_0x1c12e2[0x1]-_0x1458ce[0x1]);_0x2ac25e[_0x560e90(0x4b1)](([_0x274d19,_0x250fa1])=>{const _0xd3af90=_0x560e90;_0x17c75b+='<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20padding:10px;\x20background:#f5f5f5;\x20margin-bottom:5px;\x20border-radius:10px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+_0x274d19+_0xd3af90(0x293)+_0x250fa1+_0xd3af90(0x5bb);}),document[_0x560e90(0x58c)](_0x560e90(0x4d5))['innerHTML']=_0x17c75b,!appState[_0x560e90(0x1cc)]&&((!window[_0x560e90(0x43f)]||isHost)&&(appState[_0x560e90(0x486)]++,localStorage[_0x560e90(0x1da)](_0x560e90(0x4b0),appState[_0x560e90(0x486)]),updateUI())),document[_0x560e90(0x58c)]('homeBackBtn')[_0x560e90(0x56c)]=()=>{const _0x5ae0b5=_0x560e90;document[_0x5ae0b5(0x58c)](_0x5ae0b5(0x1e6))[_0x5ae0b5(0x24b)][_0x5ae0b5(0x218)]=_0x5ae0b5(0x1db),document[_0x5ae0b5(0x58c)]('homeScreen')[_0x5ae0b5(0x24b)][_0x5ae0b5(0x218)]=_0x5ae0b5(0x509),!appState[_0x5ae0b5(0x1cc)]&&appState[_0x5ae0b5(0x486)]>=0x1&&showActivationModal();};}
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set, get, child, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC94oRob-EIbIRudREF3SjOOJWmw3eZMyE",
+  authDomain: "ratbni-online.firebaseapp.com",
+  databaseURL: "https://ratbni-online-default-rtdb.firebaseio.com/",
+  projectId: "ratbni-online",
+  storageBucket: "ratbni-online.firebasestorage.app",
+  messagingSenderId: "366302856394",
+  appId: "1:366302856394:web:4173f8a2f266a618d9a033"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+
+let isOnlineMode = false;
+let isHost = false;
+let currentRoomID = null;
+let myPlayerName = "";
+
+// 1. زر الأونلاين
+document.getElementById('onlineBtn').onclick = () => {
+    window.isOnlineMode = true; 
+    document.getElementById('homeScreen').style.display = 'none';
+    document.getElementById('onlineLoginScreen').style.display = 'flex';
+};
+// 2. التحقق اليدوي
+window.checkAnswerManual = function() {
+    if (!window.isOnlineMode) return;
+    let typed = document.getElementById('playerAnswer').value.trim();
+    let correct = gameSession.words[gameSession.currentIndex].c;
+    if (typed === correct) {
+        get(ref(db, `rooms/${currentRoomID}/currentWinner`)).then(snap => {
+            if (!snap.exists()) {
+                set(ref(db, `rooms/${currentRoomID}/currentWinner`), myPlayerName);
+                const scoreRef = ref(db, `rooms/${currentRoomID}/players/${myPlayerName}`);
+                get(scoreRef).then(s => set(scoreRef, (s.val() || 0) + 1));
+            }
+        });
+    } else {
+        document.getElementById('answerStatus').innerText = "خطأ! حاول مرة أخرى ❌";
+        setTimeout(() => document.getElementById('answerStatus').innerText = "", 2000);
+    }
+};
+// 3. مراقبة اللعبة
+window.listenToGame = function(roomID) {
+    onValue(ref(db, `rooms/${roomID}/players`), (snapshot) => {
+        const players = snapshot.val() || {};
+        gameSession.score = players;
+        updateLiveRank();
+        const names = Object.keys(players);
+        document.getElementById('lobbyPlayersList').innerText = names.join(" - ");
+    });
+
+    onValue(ref(db, `rooms/${roomID}/currentWinner`), (snapshot) => {
+        if (snapshot.exists()) {
+            const winner = snapshot.val();
+            document.getElementById('theCard').classList.add('flipped');
+            document.getElementById('correctWordBig').innerText = gameSession.words[gameSession.currentIndex].c;
+            document.getElementById('winnerNameBig').innerText = winner;
+            document.getElementById('bigWinnerAnnouncement').style.display = "flex";
+            document.getElementById('onlineInputArea').style.display = "none";
+            if (window.isHost) {
+                document.getElementById('hostNextBtnBig').style.display = "block";
+                document.getElementById('waitHostMsg').style.display = "none";
+            } else {
+                document.getElementById('hostNextBtnBig').style.display = "none";
+                document.getElementById('waitHostMsg').style.display = "block";
+            }
+        } else {
+            document.getElementById('bigWinnerAnnouncement').style.display = "none";
+            document.getElementById('theCard').classList.remove('flipped');
+        }
+    });
+
+    onValue(ref(db, `rooms/${roomID}/currentIndex`), (snapshot) => {
+        const idx = snapshot.val();
+        // هنا المزامنة: المضيف واللاعب كلهم يمشون وراء هذا الشرط
+        if(idx !== null && idx >= 0) {  
+            document.getElementById('theCard').classList.remove('flipped');
+            get(ref(db, `rooms/${roomID}/gameWords`)).then((wordsSnap) => {
+                if (wordsSnap.exists()) {
+                    gameSession.words = wordsSnap.val();
+                }
+                gameSession.currentIndex = idx;
+                // إخفاء كل شاشات الانتظار للكل
+                document.getElementById('lobbyScreen').style.display = 'none';
+                document.getElementById('readyScreen').style.display = 'none';
+                document.getElementById('categoriesScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'flex';
+                
+                loadCard();
+                document.getElementById('playerAnswer').value = "";
+                document.getElementById('onlineInputArea').style.display = "flex";
+            });
+        }
+    });
+};
+
+// 4. إنشاء غرفة
+window.createOnlineRoom = function() {
+    if(!appState.isPremium && appState.gamesPlayed >= 1) {
+        showActivationModal();
+        return;
+    }
+    myPlayerName = document.getElementById('onlinePlayerName').value;
+    if(!myPlayerName) { alert("اكتب اسمك أولاً!"); return; }
+
+    window.isHost = true;
+    isHost = true;
+    currentRoomID = Math.floor(1000 + Math.random() * 9000);
+
+    set(ref(db, `rooms/${currentRoomID}`), {
+        host: myPlayerName,
+        currentIndex: -1,
+        players: { [myPlayerName]: 0 }
+    }).then(() => {
+        listenToGame(currentRoomID);
+        document.getElementById('onlineLoginScreen').style.display = 'none';
+        document.getElementById('lobbyScreen').style.display = 'flex';
+        document.getElementById('lobbyRoomDisplay').innerText = "رقم الغرفة: " + currentRoomID;
+        document.getElementById('hostStartBtn').style.display = 'block';
+        
+        document.getElementById('hostStartBtn').onclick = () => {
+            setupCategories();
+            document.getElementById('lobbyScreen').style.display = 'none';
+            document.getElementById('categoriesScreen').style.display = 'flex';
+            window.minCategoriesRequired = 1; 
+
+            document.getElementById('toPlayersBtn').onclick = () => {
+                prepareGame(); 
+                const count = selectedCats.length;
+                if (count > 1) {
+                    let newWords = [];
+                    for (let i = 0; i < gameSession.words.length; i += 10) {
+                        newWords.push(...gameSession.words.slice(i, i + 5));
+                    }
+                    gameSession.words = newWords;
+                } 
+
+                update(ref(db, `rooms/${currentRoomID}`), {
+                    gameWords: gameSession.words
+                }).then(() => {
+                    document.getElementById('categoriesScreen').style.display = 'none';
+                    document.getElementById('readyScreen').style.display = 'flex';
+                    
+                    document.getElementById('realStartBtn').onclick = () => {
+                        // المضيف يرسل الإشارة فقط، والـ listenToGame بتدخله هو واللاعبين سوا
+                        update(ref(db, `rooms/${currentRoomID}`), { currentIndex: 0 });
+                    };
+                });
+            };
+        };
+    });
+};
+
+// 5. انضمام لغرفة
+window.joinOnlineRoom = function() {
+    gameSession.currentIndex = -99; // قيمة وهمية لضمان استيعاب التغيير للصفر
+    myPlayerName = document.getElementById('onlinePlayerName').value;
+    currentRoomID = document.getElementById('onlineRoomID').value;
+    if(!myPlayerName || !currentRoomID) { alert("تأكد من البيانات"); return; }
+
+    get(child(ref(db), `rooms/${currentRoomID}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+            window.isHost = false;
+            isHost = false;
+            update(ref(db, `rooms/${currentRoomID}/players`), { [myPlayerName]: 0 }).then(() => {
+                listenToGame(currentRoomID);
+                document.getElementById('onlineLoginScreen').style.display = 'none';
+                document.getElementById('lobbyScreen').style.display = 'flex';
+                document.getElementById('lobbyRoomDisplay').innerText = "رقم الغرفة: " + currentRoomID;
+                document.getElementById('playerWaitMsg').style.display = 'block';
+            });
+        } else {
+            alert("الغرفة غير موجودة!");
+        }
+    });
+};
+
+window.nextOnlineWord = function() {
+    if (!window.isHost) return;
+    let nextIdx = gameSession.currentIndex + 1;
+    update(ref(db, `rooms/${currentRoomID}`), {
+        currentIndex: nextIdx,
+        currentWinner: null
+    });
+};
+</script>
+</body>
+</html>
