@@ -382,7 +382,8 @@ window.checkAnswerManual = function() {
             }
         });
     } else {
-        document.getElementById('answerStatus').innerText = "خطأ! حاول مرة أخرى ❌";
+        new Audio('wrong.mp3').play();
+   document.getElementById('answerStatus').innerText = "خطأ! حاول مرة أخرى ❌";
         setTimeout(() => document.getElementById('answerStatus').innerText = "", 2000);
     }
 };
@@ -398,6 +399,7 @@ window.listenToGame = function(roomID) {
 
     onValue(ref(db, `rooms/${roomID}/currentWinner`), (snapshot) => {
         if (snapshot.exists()) {
+   new Audio('correct.mp3').play();
             const winner = snapshot.val();
             document.getElementById('theCard').classList.add('flipped');
             document.getElementById('correctWordBig').innerText = gameSession.words[gameSession.currentIndex].c;
